@@ -139,8 +139,8 @@ class IOSDebugBridgeClient(
         }
     }
 
-    suspend fun connectToCompanion(address: Address, dispatcher: CoroutineDispatcher = this.dispatcher): String {
-        var udid = ""
+    suspend fun connectToCompanion(address: Address, dispatcher: CoroutineDispatcher = this.dispatcher): String? {
+        var udid: String? = null
         val remoteChannelBuilder = {
             Pair(
                 if (address is TcpAddress) {
