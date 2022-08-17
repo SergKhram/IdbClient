@@ -1,9 +1,7 @@
 package io.github.sergkhram.idbClient
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import idb.ConnectRequest
 import idb.TargetDescription
 import idb.TargetDescriptionRequest
@@ -122,9 +120,7 @@ class IOSDebugBridgeClient(
 
     suspend fun <T : Any?> execute(request: IdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
-            companion.grpcClient.use { grpc ->
-                return request.execute(grpc)
-            }
+            return@let request.execute(companion.grpcClient)
         } ?: throw NoSuchElementException("There is no companion with udid $udid")
     }
 

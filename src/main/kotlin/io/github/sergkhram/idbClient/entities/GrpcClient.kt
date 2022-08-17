@@ -1,12 +1,15 @@
 package io.github.sergkhram.idbClient.entities
 
 import idb.CompanionServiceGrpcKt
+import io.github.sergkhram.idbClient.logs.KLogger
 import io.grpc.ManagedChannel
-import java.io.Closeable
-import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.annotation.PreDestroy
 
-class GrpcClient(private val isLocal: Boolean = false, private val channelBuilder: () -> Pair<ManagedChannel, Process?>): Closeable {
+class GrpcClient(private val isLocal: Boolean = false, private val channelBuilder: () -> Pair<ManagedChannel, Process?>) {
+    companion object {
+        private val log = KLogger.logger
+    }
     private lateinit var channel: ManagedChannel
     private var process: Process? = null
 
@@ -20,8 +23,11 @@ class GrpcClient(private val isLocal: Boolean = false, private val channelBuilde
         CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel)
     }
 
-    override fun close() {
+    @PreDestroy
+    fun close() {
+        log.info("Started gRPC client ${this.hashCode()} shutdown")
         if(isLocal) process?.takeIf { it.isAlive }?.destroy()
         channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+        log.info("Completed gRPC client ${this.hashCode()} shutdown")
     }
 }
