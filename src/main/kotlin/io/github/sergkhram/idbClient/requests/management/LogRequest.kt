@@ -19,12 +19,6 @@ class LogRequest(
         response.takeWhileCondition {
             logs.add(it.output.toStringUtf8())
         }
-//        withTimeoutOrNull(timeout.toMillis()) {
-//            response.takeWhile { !predicate.invoke() }
-//                .collect {
-//                    logs.add(it.output.toStringUtf8())
-//                }
-//        }
         return logs
     }
 }

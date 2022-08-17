@@ -80,7 +80,7 @@ class IOSDebugBridgeClient(
                     } else {
                         (address as DomainSocketAddress).path
                     }
-                    log.info("Connection refused for $addressString")
+                    log.info("Connection refused for $addressString", e)
                 }
             }
         }
