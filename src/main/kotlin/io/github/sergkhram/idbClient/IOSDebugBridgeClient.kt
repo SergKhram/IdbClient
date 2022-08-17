@@ -28,6 +28,9 @@ class IOSDebugBridgeClient(
     companion object {
         internal val clients: ConcurrentHashMap<String, CompanionData> = ConcurrentHashMap()
         private val log = KLogger.logger
+        private val noCompanionWithUdid: (String) -> NoSuchElementException = {
+            NoSuchElementException("There is no companion with udid $it")
+        }
     }
 
     private fun JsonNode.convertJsonNodeToTargetDescription() = TargetDescription.newBuilder()
@@ -141,7 +144,7 @@ class IOSDebugBridgeClient(
             GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
                 request.execute(grpcClient)
             }
-        } ?: throw NoSuchElementException("There is no companion with udid $udid")
+        } ?: throw noCompanionWithUdid(udid)
     }
 
     suspend fun <T : Any?> execute(request: AsyncIdbRequest<Flow<T>>, udid: String): Flow<T> {
@@ -151,7 +154,7 @@ class IOSDebugBridgeClient(
                 .onCompletion {
                     grpcClient.close()
                 }
-        } ?: throw NoSuchElementException("There is no companion with udid $udid")
+        } ?: throw noCompanionWithUdid(udid)
     }
 
     suspend fun <T : Any?> execute(request: PredicateIdbRequest<T>, udid: String): T {
@@ -159,7 +162,7 @@ class IOSDebugBridgeClient(
             GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
                 request.execute(grpcClient)
             }
-        } ?: throw NoSuchElementException("There is no companion with udid $udid")
+        } ?: throw noCompanionWithUdid(udid)
     }
 
     suspend fun getTargetsList(): List<TargetDescription> {
