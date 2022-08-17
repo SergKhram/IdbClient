@@ -44,44 +44,8 @@ class IOSDebugBridgeClient(
 
     init {
         listOfCompanions.forEach { address ->
-            val remoteChannelBuilder = {
-                Pair(
-                    if (address is TcpAddress) {
-                        ManagedChannelBuilder.forAddress(address.host, address.port).usePlaintext()
-                            .executor(dispatcher.asExecutor()).build()
-                    } else {
-                        val domainAddress = address as DomainSocketAddress
-                        ManagedChannelBuilder.forTarget(domainAddress.path).usePlaintext()
-                            .executor(dispatcher.asExecutor())
-                            .build()
-                    },
-                    null
-                )
-            }
             runBlocking {
-                val tempFile = withContext(dispatcher) {
-                    Files.createTempFile("temp", ".tmp")
-                }.toFile().also {
-                    it.setReadable(true)
-                    it.setWritable(true)
-                }
-
-                val grpcClient = GrpcClient(remoteChannelBuilder)
-                try {
-                    val connectionResponse = grpcClient.use {
-                        it.stub.connect(
-                            ConnectRequest.newBuilder().setLocalFilePath(tempFile.absolutePath).build()
-                        )
-                    }
-                    clients[connectionResponse.companion.udid] = CompanionData(remoteChannelBuilder, false)
-                } catch (e: StatusException) {
-                    val addressString = if(address is TcpAddress) {
-                        address.host + ":" + address.port
-                    } else {
-                        (address as DomainSocketAddress).path
-                    }
-                    log.info("Connection refused for $addressString", e)
-                }
+                connectToCompanion(address)
             }
         }
         if (withLocal && System.getProperty("os.name")
@@ -173,5 +137,49 @@ class IOSDebugBridgeClient(
                 ).targetDescription
             }
         }
+    }
+
+    suspend fun connectToCompanion(address: Address, dispatcher: CoroutineDispatcher = this.dispatcher): String {
+        var udid = ""
+        val remoteChannelBuilder = {
+            Pair(
+                if (address is TcpAddress) {
+                    ManagedChannelBuilder.forAddress(address.host, address.port).usePlaintext()
+                        .executor(dispatcher.asExecutor()).build()
+                } else {
+                    val domainAddress = address as DomainSocketAddress
+                    ManagedChannelBuilder.forTarget(domainAddress.path).usePlaintext()
+                        .executor(dispatcher.asExecutor())
+                        .build()
+                },
+                null
+            )
+        }
+
+        val tempFile = withContext(dispatcher) {
+            Files.createTempFile("temp", ".tmp")
+        }.toFile().also {
+            it.setReadable(true)
+            it.setWritable(true)
+        }
+
+        try {
+            val grpcClient = GrpcClient(remoteChannelBuilder)
+            val connectionResponse = grpcClient.use {
+                it.stub.connect(
+                    ConnectRequest.newBuilder().setLocalFilePath(tempFile.absolutePath).build()
+                )
+            }
+            udid = connectionResponse.companion.udid
+            clients[udid] = CompanionData(remoteChannelBuilder, false)
+        } catch (e: StatusException) {
+            val addressString = if(address is TcpAddress) {
+                address.host + ":" + address.port
+            } else {
+                (address as DomainSocketAddress).path
+            }
+            log.info("Connection refused for $addressString", e)
+        }
+        return udid
     }
 }
