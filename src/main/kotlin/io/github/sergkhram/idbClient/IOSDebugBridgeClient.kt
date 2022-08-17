@@ -43,8 +43,8 @@ class IOSDebugBridgeClient(
         .build()
 
     init {
-        listOfCompanions.forEach { address ->
-            runBlocking {
+        runBlocking {
+            listOfCompanions.forEach { address ->
                 connectToCompanion(address)
             }
         }
