@@ -103,7 +103,7 @@ class IOSDebugBridgeClient(
         }
     }
 
-    @Throws(NoSuchElementException::class)
+    @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: IdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
@@ -112,7 +112,7 @@ class IOSDebugBridgeClient(
         } ?: throw noCompanionWithUdid(udid)
     }
 
-    @Throws(NoSuchElementException::class)
+    @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: AsyncIdbRequest<Flow<T>>, udid: String): Flow<T> {
         return clients[udid]?.let { companion ->
             val grpcClient = GrpcClient(companion.channelBuilder, companion.isLocal)
@@ -123,7 +123,7 @@ class IOSDebugBridgeClient(
         } ?: throw noCompanionWithUdid(udid)
     }
 
-    @Throws(NoSuchElementException::class)
+    @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: PredicateIdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
