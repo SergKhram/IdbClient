@@ -103,6 +103,7 @@ class IOSDebugBridgeClient(
         }
     }
 
+    @Throws(NoSuchElementException::class)
     suspend fun <T : Any?> execute(request: IdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
@@ -111,6 +112,7 @@ class IOSDebugBridgeClient(
         } ?: throw noCompanionWithUdid(udid)
     }
 
+    @Throws(NoSuchElementException::class)
     suspend fun <T : Any?> execute(request: AsyncIdbRequest<Flow<T>>, udid: String): Flow<T> {
         return clients[udid]?.let { companion ->
             val grpcClient = GrpcClient(companion.channelBuilder, companion.isLocal)
@@ -121,6 +123,7 @@ class IOSDebugBridgeClient(
         } ?: throw noCompanionWithUdid(udid)
     }
 
+    @Throws(NoSuchElementException::class)
     suspend fun <T : Any?> execute(request: PredicateIdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
@@ -130,11 +133,16 @@ class IOSDebugBridgeClient(
     }
 
     suspend fun getTargetsList(): List<TargetDescription> {
-        return clients.elements().toList().map { companion ->
-            GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
-                grpcClient.stub.describe(
-                    TargetDescriptionRequest.getDefaultInstance()
-                ).targetDescription
+        return clients.mapNotNull { client ->
+            try {
+                GrpcClient(client.value.channelBuilder, client.value.isLocal).use { grpcClient ->
+                    grpcClient.stub.describe(
+                        TargetDescriptionRequest.getDefaultInstance()
+                    ).targetDescription
+                }
+            } catch (e: StatusException) {
+                log.info("Connection refused for ${client.key}", e)
+                null
             }
         }
     }
