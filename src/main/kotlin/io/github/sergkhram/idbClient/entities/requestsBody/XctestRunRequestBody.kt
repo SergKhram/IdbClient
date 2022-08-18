@@ -20,7 +20,7 @@ sealed class XctestRunRequestBody {
         val args: List<String> = emptyList(),
         val timeout: Long = 0L,
     ) : XctestRunRequestBody() {
-        override val requestBody = XctestRunRequest.newBuilder()
+        override val requestBody: XctestRunRequest = XctestRunRequest.newBuilder()
             .setMode(XctestRunRequest.Mode.newBuilder().setLogic(XctestRunRequest.Logic.getDefaultInstance()))
             .setTestBundleId(testBundleId)
             .setReportActivities(reportActivities)
@@ -60,7 +60,7 @@ sealed class XctestRunRequestBody {
         val args: List<String> = emptyList(),
         val timeout: Long = 0L,
     ) : XctestRunRequestBody() {
-        override val requestBody = XctestRunRequest.newBuilder()
+        override val requestBody: XctestRunRequest = XctestRunRequest.newBuilder()
             .setMode(
                 XctestRunRequest.Mode.newBuilder()
                     .setUi(
@@ -108,7 +108,7 @@ sealed class XctestRunRequestBody {
         val args: List<String> = emptyList(),
         val timeout: Long = 0L,
     ) : XctestRunRequestBody() {
-        override val requestBody = XctestRunRequest.newBuilder()
+        override val requestBody: XctestRunRequest = XctestRunRequest.newBuilder()
             .setMode(
                 XctestRunRequest.Mode.newBuilder()
                     .setApplication(

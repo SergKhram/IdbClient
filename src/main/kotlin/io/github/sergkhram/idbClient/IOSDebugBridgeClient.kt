@@ -14,16 +14,16 @@ import io.github.sergkhram.idbClient.util.JsonUtil
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusException
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onCompletion
 import java.io.File
 import java.io.IOException
-import java.nio.file.Files
 import java.util.concurrent.ConcurrentHashMap
 
 class IOSDebugBridgeClient(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val listOfCompanions: List<Address> = emptyList(),
-    private val withLocal: Boolean = false
+    withLocal: Boolean = false
 ) {
     companion object {
         internal val clients: ConcurrentHashMap<String, CompanionData> = ConcurrentHashMap()
@@ -96,9 +96,9 @@ class IOSDebugBridgeClient(
                     }
                 }
             } catch (e: IOException) {
-                e.printStackTrace()
+                log.info(e.localizedMessage, e)
             } finally {
-                proc?.destroy()
+                proc?.takeIf { proc.isAlive }?.destroy()
             }
         }
     }
@@ -156,18 +156,11 @@ class IOSDebugBridgeClient(
             )
         }
 
-        val tempFile = withContext(dispatcher) {
-            Files.createTempFile("temp", ".tmp")
-        }.toFile().also {
-            it.setReadable(true)
-            it.setWritable(true)
-        }
-
         try {
             val grpcClient = GrpcClient(remoteChannelBuilder)
             val connectionResponse = grpcClient.use {
                 it.stub.connect(
-                    ConnectRequest.newBuilder().setLocalFilePath(tempFile.absolutePath).build()
+                    ConnectRequest.getDefaultInstance()
                 )
             }
             udid = connectionResponse.companion.udid

@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Duration
 
-abstract class PredicateIdbRequest<T : Any?>(val predicate: () -> Boolean, val timeout: Duration) : IdbRequest<T>() {
+abstract class PredicateIdbRequest<T : Any?>(private val predicate: () -> Boolean, private val timeout: Duration) : IdbRequest<T>() {
     suspend fun <I> Flow<I>.takeWhileCondition(action: (I) -> Unit) {
         val flow = this
         withTimeoutOrNull(timeout.toMillis()) {
