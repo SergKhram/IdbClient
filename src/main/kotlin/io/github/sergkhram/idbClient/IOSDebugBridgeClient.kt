@@ -1,16 +1,21 @@
 package io.github.sergkhram.idbClient
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import idb.TargetDescription
 import idb.TargetDescriptionRequest
+import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
+import io.github.sergkhram.idbClient.Const.localTargetsListCmd
+import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
+import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
 import io.github.sergkhram.idbClient.entities.*
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.util.JsonUtil
+import io.github.sergkhram.idbClient.util.cmdBuilder
+import io.github.sergkhram.idbClient.util.convertJsonNodeToTargetDescription
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusException
 import kotlinx.coroutines.*
@@ -18,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onCompletion
 import java.io.File
 import java.io.IOException
+import java.net.ServerSocket
 import java.util.concurrent.ConcurrentHashMap
 
 class IOSDebugBridgeClient(
@@ -26,21 +32,10 @@ class IOSDebugBridgeClient(
     withLocal: Boolean = false
 ) {
     companion object {
-        internal val clients: ConcurrentHashMap<String, CompanionData> = ConcurrentHashMap()
         private val log = KLogger.logger
-        private val noCompanionWithUdid: (String) -> NoSuchElementException = {
-            NoSuchElementException("There is no companion with udid $it")
-        }
     }
 
-    private fun JsonNode.convertJsonNodeToTargetDescription() = TargetDescription.newBuilder()
-        .setUdid(this.get("udid").asText())
-        .setName(this.get("name").asText())
-        .setState(this.get("state").asText())
-        .setTargetType(this.get("type").asText())
-        .setOsVersion(this.get("os_version").asText())
-        .setArchitecture(this.get("architecture").asText())
-        .build()
+    private val clients: ConcurrentHashMap<String, CompanionData> = ConcurrentHashMap()
 
     init {
         runBlocking {
@@ -48,18 +43,13 @@ class IOSDebugBridgeClient(
                 connectToCompanion(address)
             }
         }
-        if (withLocal && System.getProperty("os.name")
-                .contains("mac", ignoreCase = true) && File("/usr/local/bin/idb_companion").exists()
+        if (withLocal
+            && System.getProperty("os.name").contains("mac", ignoreCase = true)
+            && File(localIdbCompanionPath).exists()
         ) {
             var proc: Process? = null
             try {
-                val cmd = listOf("/usr/local/bin/idb_companion", "--list", "1", "--json")
-                proc = ProcessBuilder(cmd)
-                    .directory(File(System.getProperty("user.home")))
-                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                    .redirectError(ProcessBuilder.Redirect.PIPE)
-                    .start()
-
+                proc = cmdBuilder(localTargetsListCmd)
                 proc.waitFor()
                 val output = proc.inputStream.bufferedReader().readText()
 
@@ -77,14 +67,8 @@ class IOSDebugBridgeClient(
                     target.let {
                         clients[it.udid] = CompanionData(
                             {
-                                val port = 10882
-                                val runCompanionCmd =
-                                    listOf("/usr/local/bin/idb_companion", "--udid", it.udid, "> /dev/null 2>&1")
-                                val runCompanionProc = ProcessBuilder(runCompanionCmd)
-                                    .directory(File(System.getProperty("user.home")))
-                                    .redirectOutput(ProcessBuilder.Redirect.PIPE)
-                                    .redirectError(ProcessBuilder.Redirect.PIPE)
-                                    .start()
+                                val port = ServerSocket(0).use { socket -> socket.localPort }
+                                val runCompanionProc = cmdBuilder(startLocalCompanionCmd(it.udid))
                                 Pair(
                                     ManagedChannelBuilder.forAddress("127.0.0.1", port).usePlaintext()
                                         .executor(dispatcher.asExecutor()).build(),
@@ -182,5 +166,9 @@ class IOSDebugBridgeClient(
             log.info("Connection refused for $addressString", e)
         }
         return udid
+    }
+
+    fun disconnectCompanion(udid: String) {
+        clients.remove(udid)
     }
 }
