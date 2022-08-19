@@ -14,7 +14,7 @@ import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.util.JsonUtil
-import io.github.sergkhram.idbClient.util.cmdBuilder
+import io.github.sergkhram.idbClient.util.processBuilder
 import io.github.sergkhram.idbClient.util.convertJsonNodeToTargetDescription
 import io.grpc.ManagedChannelBuilder
 import io.grpc.StatusException
@@ -49,7 +49,7 @@ class IOSDebugBridgeClient(
         ) {
             var proc: Process? = null
             try {
-                proc = cmdBuilder(localTargetsListCmd)
+                proc = processBuilder(localTargetsListCmd).start()
                 proc.waitFor()
                 val output = proc.inputStream.bufferedReader().readText()
 
@@ -66,16 +66,8 @@ class IOSDebugBridgeClient(
                 localTargets?.forEach { target ->
                     target.let {
                         clients[it.udid] = CompanionData(
-                            {
-                                val port = ServerSocket(0).use { socket -> socket.localPort }
-                                val runCompanionProc = cmdBuilder(startLocalCompanionCmd(it.udid))
-                                Pair(
-                                    ManagedChannelBuilder.forAddress("127.0.0.1", port).usePlaintext()
-                                        .executor(dispatcher.asExecutor()).build(),
-                                    runCompanionProc
-                                )
-                            },
-                            true
+                            TcpAddress("127.0.0.1"),
+                            true,
                         )
                     }
                 }
@@ -90,7 +82,7 @@ class IOSDebugBridgeClient(
     @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: IdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
-            GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
+            GrpcClient(companion.address, companion.isLocal, udid = udid).use { grpcClient ->
                 request.execute(grpcClient)
             }
         } ?: throw noCompanionWithUdid(udid)
@@ -99,7 +91,7 @@ class IOSDebugBridgeClient(
     @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: AsyncIdbRequest<Flow<T>>, udid: String): Flow<T> {
         return clients[udid]?.let { companion ->
-            val grpcClient = GrpcClient(companion.channelBuilder, companion.isLocal)
+            val grpcClient = GrpcClient(companion.address, companion.isLocal, udid = udid)
             return@let request.execute(grpcClient)
                 .onCompletion {
                     grpcClient.close()
@@ -110,7 +102,7 @@ class IOSDebugBridgeClient(
     @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: PredicateIdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
-            GrpcClient(companion.channelBuilder, companion.isLocal).use { grpcClient ->
+            GrpcClient(companion.address, companion.isLocal, udid = udid).use { grpcClient ->
                 request.execute(grpcClient)
             }
         } ?: throw noCompanionWithUdid(udid)
@@ -119,7 +111,7 @@ class IOSDebugBridgeClient(
     suspend fun getTargetsList(): List<TargetDescription> {
         return clients.mapNotNull { client ->
             try {
-                GrpcClient(client.value.channelBuilder, client.value.isLocal).use { grpcClient ->
+                GrpcClient(client.value.address, client.value.isLocal, udid = client.key).use { grpcClient ->
                     grpcClient.stub.describe(
                         TargetDescriptionRequest.getDefaultInstance()
                     ).targetDescription
@@ -133,30 +125,15 @@ class IOSDebugBridgeClient(
 
     suspend fun connectToCompanion(address: Address, dispatcher: CoroutineDispatcher = this.dispatcher): String? {
         var udid: String? = null
-        val remoteChannelBuilder = {
-            Pair(
-                if (address is TcpAddress) {
-                    ManagedChannelBuilder.forAddress(address.host, address.port).usePlaintext()
-                        .executor(dispatcher.asExecutor()).build()
-                } else {
-                    val domainAddress = address as DomainSocketAddress
-                    ManagedChannelBuilder.forTarget(domainAddress.path).usePlaintext()
-                        .executor(dispatcher.asExecutor())
-                        .build()
-                },
-                null
-            )
-        }
-
         try {
-            val grpcClient = GrpcClient(remoteChannelBuilder)
+            val grpcClient = GrpcClient(address, dispatcher = dispatcher)
             val connectionResponse = grpcClient.use {
                 it.stub.connect(
                     ConnectRequest.getDefaultInstance()
                 )
             }
             udid = connectionResponse.companion.udid
-            clients[udid] = CompanionData(remoteChannelBuilder, false)
+            clients[udid] = CompanionData(address)
         } catch (e: StatusException) {
             val addressString = if(address is TcpAddress) {
                 address.host + ":" + address.port

@@ -13,10 +13,9 @@ internal fun JsonNode.convertJsonNodeToTargetDescription() = TargetDescription.n
     .setArchitecture(this.get("architecture").asText())
     .build()
 
-internal val cmdBuilder: (List<String>) -> Process = {
+internal val processBuilder: (List<String>) -> ProcessBuilder = {
     ProcessBuilder(it)
         .directory(File(System.getProperty("user.home")))
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
 }
