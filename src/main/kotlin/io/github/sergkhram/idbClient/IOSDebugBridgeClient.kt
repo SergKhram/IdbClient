@@ -68,7 +68,7 @@ class IOSDebugBridgeClient(
                         clients[it.udid] = CompanionData(
                             {
                                 val port = ServerSocket(0).use { socket -> socket.localPort }
-                                val runCompanionProc = cmdBuilder(startLocalCompanionCmd(it.udid))
+                                val runCompanionProc = cmdBuilder(startLocalCompanionCmd(it.udid, port))
                                 Pair(
                                     ManagedChannelBuilder.forAddress("127.0.0.1", port).usePlaintext()
                                         .executor(dispatcher.asExecutor()).build(),
@@ -156,7 +156,7 @@ class IOSDebugBridgeClient(
                 )
             }
             udid = connectionResponse.companion.udid
-            clients[udid] = CompanionData(remoteChannelBuilder, false)
+            clients[udid] = CompanionData(remoteChannelBuilder)
         } catch (e: StatusException) {
             val addressString = if(address is TcpAddress) {
                 address.host + ":" + address.port
