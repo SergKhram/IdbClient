@@ -9,7 +9,7 @@ sealed class PayloadRequestBody {
     abstract val requestBody: Payload
 
     data class UpdateContactsPayload(val contactsDbFile: File): PayloadRequestBody() {
-        override val requestBody = Payload.newBuilder().setData(
+        override val requestBody: Payload = Payload.newBuilder().setData(
             ByteString.copyFrom(
                 FileUtils.readFileToByteArray(contactsDbFile)
             )

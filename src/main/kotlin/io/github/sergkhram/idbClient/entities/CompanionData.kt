@@ -1,3 +1,5 @@
 package io.github.sergkhram.idbClient.entities
 
-class CompanionData(val grpcClient: GrpcClient, val isLocal: Boolean = false)
+import io.grpc.ManagedChannel
+
+class CompanionData(val channelBuilder: () -> Pair<ManagedChannel, Process?>, val isLocal: Boolean = false)

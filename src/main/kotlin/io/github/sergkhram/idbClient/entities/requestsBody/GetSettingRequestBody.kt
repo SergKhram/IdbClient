@@ -7,12 +7,12 @@ sealed class GetSettingRequestBody {
     abstract val requestBody: GetSettingRequest
 
     data class LocaleSetting(val localeIdentifier: String) : GetSettingRequestBody() {
-        override val requestBody = GetSettingRequest.newBuilder().setSetting(Setting.LOCALE).build()
+        override val requestBody: GetSettingRequest = GetSettingRequest.newBuilder().setSetting(Setting.LOCALE).build()
     }
 
     data class AnySetting(val name: String, val value: String, val valueType: String, val domain: String?) :
         GetSettingRequestBody() {
-        override val requestBody = GetSettingRequest.newBuilder()
+        override val requestBody: GetSettingRequest = GetSettingRequest.newBuilder()
             .setSetting(Setting.ANY)
             .setName(name)
             .setDomain(domain)
