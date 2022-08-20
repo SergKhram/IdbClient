@@ -10,7 +10,7 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 import javax.annotation.PreDestroy
 
-class GrpcClient(
+internal class GrpcClient(
     private val channelBuilder: () -> Pair<ManagedChannel, ProcessBuilder?>, private val isLocal: Boolean = false
 ): Closeable {
     companion object {

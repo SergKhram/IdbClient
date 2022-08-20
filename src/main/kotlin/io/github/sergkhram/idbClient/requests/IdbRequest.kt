@@ -8,5 +8,5 @@ abstract class IdbRequest<T : Any?> {
         internal val log = KLogger.logger
     }
 
-    abstract suspend fun execute(client: GrpcClient): T
+    internal abstract suspend fun execute(client: GrpcClient): T
 }
