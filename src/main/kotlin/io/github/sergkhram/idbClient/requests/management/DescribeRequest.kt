@@ -6,7 +6,9 @@ import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.entities.requestsBody.TargetDescriptionRequestBody
 import io.github.sergkhram.idbClient.requests.IdbRequest
 
-class DescribeRequest(private val requestBody: TargetDescriptionRequestBody) : IdbRequest<TargetDescriptionResponse>() {
+class DescribeRequest(
+    private val requestBody: TargetDescriptionRequestBody = TargetDescriptionRequestBody(false)
+) : IdbRequest<TargetDescriptionResponse>() {
     override suspend fun execute(client: GrpcClient): TargetDescriptionResponse {
         return client.stub.describe(
             TargetDescriptionRequest.newBuilder().setFetchDiagnostics(requestBody.fetchDiagnostics).build()

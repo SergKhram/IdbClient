@@ -3,7 +3,6 @@ package io.github.sergkhram.idbClient
 import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import idb.TargetDescription
-import idb.TargetDescriptionRequest
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
 import io.github.sergkhram.idbClient.Const.localTargetsListCmd
 import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
@@ -13,6 +12,7 @@ import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
+import io.github.sergkhram.idbClient.requests.management.DescribeRequest
 import io.github.sergkhram.idbClient.util.JsonUtil
 import io.github.sergkhram.idbClient.util.cmdBuilder
 import io.github.sergkhram.idbClient.util.convertJsonNodeToTargetDescription
@@ -49,7 +49,7 @@ class IOSDebugBridgeClient(
         ) {
             var proc: Process? = null
             try {
-                proc = cmdBuilder(localTargetsListCmd)
+                proc = cmdBuilder(localTargetsListCmd).start()
                 proc.waitFor()
                 val output = proc.inputStream.bufferedReader().readText()
 
@@ -117,21 +117,20 @@ class IOSDebugBridgeClient(
     }
 
     suspend fun getTargetsList(): List<TargetDescription> {
-        return clients.mapNotNull { client ->
+        return clients.pMap { client ->
             try {
                 GrpcClient(client.value.channelBuilder, client.value.isLocal).use { grpcClient ->
-                    grpcClient.stub.describe(
-                        TargetDescriptionRequest.getDefaultInstance()
-                    ).targetDescription
+                    DescribeRequest().execute(grpcClient).targetDescription
                 }
             } catch (e: StatusException) {
                 log.info("Connection refused for ${client.key}", e)
                 null
             }
-        }
+        }.filterNotNull()
     }
 
     suspend fun connectToCompanion(address: Address, dispatcher: CoroutineDispatcher = this.dispatcher): String? {
+        log.debug("Connecting $address companion started")
         var udid: String? = null
         val remoteChannelBuilder = {
             Pair(
@@ -157,6 +156,7 @@ class IOSDebugBridgeClient(
             }
             udid = connectionResponse.companion.udid
             clients[udid] = CompanionData(remoteChannelBuilder)
+            log.debug("Connecting $address companion finished")
         } catch (e: StatusException) {
             val addressString = if(address is TcpAddress) {
                 address.host + ":" + address.port
@@ -169,6 +169,12 @@ class IOSDebugBridgeClient(
     }
 
     fun disconnectCompanion(udid: String) {
-        clients.remove(udid)
+        log.debug("Disconnecting $udid companion started")
+        clients.takeIf { it.containsKey(udid) }?.remove(udid)
+        log.debug("Disconnecting $udid companion finished")
+    }
+
+    private suspend fun <K, V, B> ConcurrentHashMap<K, V>.pMap(f: suspend (Map.Entry<K, V>) -> B?): List<B?> = coroutineScope {
+        map { async { f(it) } }.awaitAll()
     }
 }
