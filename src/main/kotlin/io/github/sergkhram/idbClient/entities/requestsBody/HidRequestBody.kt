@@ -4,6 +4,7 @@ import idb.HIDEvent
 import idb.HIDEvent.HIDPress
 import idb.HIDEvent.HIDPressAction
 import idb.Point
+import io.github.sergkhram.idbClient.entities.requestsBody.AppleCodeEvents.mapOfCodes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 
@@ -11,7 +12,7 @@ sealed class HidRequestBody {
     abstract val requestBody: Flow<HIDEvent>
     data class TextCmdHidRequestBody(val text: String) : HidRequestBody() {
         override val requestBody = text.flatMap {
-            prepareKeyCodeEvents(it.code)
+            mapOfCodes[it] ?: emptyList()
         }.asFlow()
     }
     data class TapCmdRequestBody(val x: Double, val y: Double, val duration: Double = 0.0) : HidRequestBody() {
