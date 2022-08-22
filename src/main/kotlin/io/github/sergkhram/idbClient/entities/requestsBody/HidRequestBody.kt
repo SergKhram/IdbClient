@@ -22,7 +22,7 @@ sealed class HidRequestBody {
             val list = mutableListOf<HIDEvent>()
             val action = HIDPressAction.newBuilder()
                 .setTouch(
-                    HIDEvent.HIDTouch.newBuilder().setPoint(idb.Point.newBuilder().setY(y).setX(x)).build()
+                    HIDEvent.HIDTouch.newBuilder().setPoint(Point.newBuilder().setY(y).setX(x)).build()
                 )
                 .build()
             list.add(
