@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.files
 
 class FileContainer(val bundleId: String = "", val kind: ContainerKind = ContainerKind.ROOT)
 

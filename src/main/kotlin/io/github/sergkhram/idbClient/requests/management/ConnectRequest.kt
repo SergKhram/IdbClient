@@ -2,7 +2,7 @@ package io.github.sergkhram.idbClient.requests.management
 
 import idb.ConnectResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.requestsBody.ConnectRequestBody
+import io.github.sergkhram.idbClient.entities.requestsBody.management.ConnectRequestBody
 import io.github.sergkhram.idbClient.requests.IdbRequest
 
 class ConnectRequest(private val requestBody: ConnectRequestBody): IdbRequest<ConnectResponse>() {

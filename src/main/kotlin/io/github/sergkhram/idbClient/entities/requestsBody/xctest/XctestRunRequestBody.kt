@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.xctest
 
 import idb.XctestRunRequest
 

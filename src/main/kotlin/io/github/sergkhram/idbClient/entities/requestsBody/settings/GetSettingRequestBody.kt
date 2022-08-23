@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.settings
 
 import idb.GetSettingRequest
 import idb.Setting

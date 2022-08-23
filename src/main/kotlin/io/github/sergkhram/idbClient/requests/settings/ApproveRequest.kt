@@ -3,7 +3,7 @@ package io.github.sergkhram.idbClient.requests.settings
 import idb.ApproveRequest
 import idb.ApproveResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.requestsBody.Permission
+import io.github.sergkhram.idbClient.entities.requestsBody.settings.Permission
 import io.github.sergkhram.idbClient.requests.IdbRequest
 
 class ApproveRequest(

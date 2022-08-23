@@ -1,10 +1,10 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.interaction
 
 import idb.HIDEvent
 import idb.HIDEvent.HIDPress
 import idb.HIDEvent.HIDPressAction
 import idb.Point
-import io.github.sergkhram.idbClient.entities.requestsBody.AppleCodeEvents.mapOfCodes
+import io.github.sergkhram.idbClient.entities.requestsBody.interaction.AppleCodeEvents.mapOfCodes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 
