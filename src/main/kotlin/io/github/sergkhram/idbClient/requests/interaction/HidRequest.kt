@@ -2,7 +2,7 @@ package io.github.sergkhram.idbClient.requests.interaction
 
 import idb.HIDResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.requestsBody.HidRequestBody
+import io.github.sergkhram.idbClient.entities.requestsBody.interaction.HidRequestBody
 import io.github.sergkhram.idbClient.requests.IdbRequest
 
 class HidRequest(private val hid: HidRequestBody): IdbRequest<HIDResponse>() {

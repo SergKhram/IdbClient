@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.settings
 
 enum class Permission(val value: Int) {
     PHOTOS(0),

@@ -2,8 +2,8 @@ package io.github.sergkhram.idbClient.requests.files
 
 import idb.PullResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.requestsBody.FileContainer
-import io.github.sergkhram.idbClient.entities.requestsBody.toFileContainerProto
+import io.github.sergkhram.idbClient.entities.requestsBody.files.FileContainer
+import io.github.sergkhram.idbClient.entities.requestsBody.files.toFileContainerProto
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import kotlinx.coroutines.flow.Flow
 

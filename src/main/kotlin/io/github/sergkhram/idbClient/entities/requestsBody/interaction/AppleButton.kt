@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.interaction
 
 enum class AppleButton(val value: Int) {
     APPLE_PAY(0),

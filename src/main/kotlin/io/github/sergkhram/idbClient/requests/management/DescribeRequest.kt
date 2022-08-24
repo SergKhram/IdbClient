@@ -3,7 +3,7 @@ package io.github.sergkhram.idbClient.requests.management
 import idb.TargetDescriptionRequest
 import idb.TargetDescriptionResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.requestsBody.TargetDescriptionRequestBody
+import io.github.sergkhram.idbClient.entities.requestsBody.management.TargetDescriptionRequestBody
 import io.github.sergkhram.idbClient.requests.IdbRequest
 
 class DescribeRequest(

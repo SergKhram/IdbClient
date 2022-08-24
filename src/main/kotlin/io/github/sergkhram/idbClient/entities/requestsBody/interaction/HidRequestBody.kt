@@ -1,20 +1,32 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.interaction
 
 import idb.HIDEvent
 import idb.HIDEvent.HIDPress
 import idb.HIDEvent.HIDPressAction
 import idb.Point
-import io.github.sergkhram.idbClient.entities.requestsBody.AppleCodeEvents.mapOfCodes
+import io.github.sergkhram.idbClient.entities.requestsBody.interaction.AppleCodeEvents.mapOfCodes
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 
 sealed class HidRequestBody {
     abstract val requestBody: Flow<HIDEvent>
+
+    /**
+     * Input text
+     * @param text - Text to input
+     */
     data class TextCmdHidRequestBody(val text: String) : HidRequestBody() {
         override val requestBody = text.flatMap {
             mapOfCodes[it] ?: emptyList()
         }.asFlow()
     }
+
+    /**
+     * Tap On the Screen
+     * @param x - The x-coordinate
+     * @param y - The y-coordinate
+     * @param duration - Press duration
+     */
     data class TapCmdRequestBody(val x: Double, val y: Double, val duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareListOfTapEvents(x, y, duration).asFlow()
 
@@ -47,6 +59,12 @@ sealed class HidRequestBody {
             return list
         }
     }
+
+    /**
+     * A single press of a button
+     * @param button - The button name
+     * @param duration - Press duration
+     */
     data class ButtonPressCmdRequestBody(val button: AppleButton, val duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareListOfButtonClickEvents(button, duration).asFlow()
 
@@ -79,12 +97,33 @@ sealed class HidRequestBody {
             return list
         }
     }
+
+    /**
+     * A short press of a keycode
+     * @param code - The key code
+     * @param duration - Press duration
+     */
     data class KeyPressCmdRequestBody(val code: Int, val duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareKeyCodeEvents(code, duration).asFlow()
     }
+
+    /**
+     * A sequence of short presses of a keycode
+     * @param keys - list of key codes
+     */
     data class KeysPressCmdRequestBody(val keys: List<Int>) : HidRequestBody() {
         override val requestBody = keys.flatMap { prepareKeyCodeEvents(it) }.asFlow()
     }
+
+    /**
+     * Swipe from one point to another point
+     * @param startX - The x-coordinate of the swipe start point
+     * @param startY - The y-coordinate of the swipe start point
+     * @param endX - The x-coordinate of the swipe end point
+     * @param endY - The y-coordinate of the swipe end point
+     * @param deltaValue - delta in pixels between every touch point on the line between start and end points
+     * @param durationValue - Swipe duration
+     */
     data class SwipeCmdRequestBody(
         val startX: Double,
         val startY: Double,

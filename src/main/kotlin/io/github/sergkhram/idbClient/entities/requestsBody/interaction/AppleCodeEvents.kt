@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.entities.requestsBody
+package io.github.sergkhram.idbClient.entities.requestsBody.interaction
 
 import idb.HIDEvent
 import idb.HIDEvent.HIDKey

@@ -2,7 +2,7 @@ package io.github.sergkhram.idbClient.requests.xctest
 
 import idb.XctestRunResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.requestsBody.XctestRunRequestBody
+import io.github.sergkhram.idbClient.entities.requestsBody.xctest.XctestRunRequestBody
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import kotlinx.coroutines.flow.Flow
 
