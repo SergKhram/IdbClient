@@ -8,4 +8,6 @@ object JsonUtil {
     private val objectMapper: ObjectMapper = jacksonObjectMapper()
 
     fun convertStringToJsonNode(jsonString: String): JsonNode = objectMapper.readTree(jsonString)
+
+    fun <T> convertModelToString(model: T): String = objectMapper.writeValueAsString(model)
 }
