@@ -1,17 +1,14 @@
 package io.github.sergkhram.idbClient.requests.files
 
-import com.google.protobuf.ByteString
-import idb.Payload
 import idb.PushResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
+import io.github.sergkhram.idbClient.entities.requestsBody.PayloadRequestBody
 import io.github.sergkhram.idbClient.entities.requestsBody.files.FileContainer
 import io.github.sergkhram.idbClient.entities.requestsBody.files.toFileContainerProto
 import io.github.sergkhram.idbClient.requests.IdbRequest
+import io.github.sergkhram.idbClient.util.compress
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
-import org.apache.commons.io.FileUtils
-import org.zeroturnaround.zip.ZipUtil
-import java.io.File
 import kotlin.io.path.deleteIfExists
 
 
@@ -21,9 +18,7 @@ class PushRequest(
     val container: FileContainer
 ): IdbRequest<PushResponse>(){
     override suspend fun execute(client: GrpcClient): PushResponse {
-        val zipFile = kotlin.io.path.createTempFile(suffix = ".zip")
-        val srcFile = File(srcPath)
-        if(srcFile.isDirectory) ZipUtil.pack(srcFile, zipFile.toFile()) else ZipUtil.packEntry(srcFile, zipFile.toFile())
+        val zipPath = compress(srcPath)
         val listOfRequests = listOf(
             idb.PushRequest.newBuilder()
                 .setInner(
@@ -36,28 +31,22 @@ class PushRequest(
                 .build(),
             idb.PushRequest.newBuilder()
                 .setPayload(
-                    Payload.newBuilder()
-                        .setData(
-                            ByteString.copyFrom(
-                                FileUtils.readFileToByteArray(zipFile.toFile())
-                            )
-                        )
-                        .build()
+                    PayloadRequestBody.DataPayload(zipPath.toFile()).requestBody
                 )
                 .build()
         )
-        zipFile.deleteIfExists()
+        zipPath.deleteIfExists()
 
-        val flowOfRequests = flow {
+        val requestFlow = flow {
             listOfRequests.forEach {
-                log.info { "Sending $it" }
+                log.info { "Sending: $it" }
                 emit(it)
                 delay(timeMillis = 100L)
             }
         }
 
         return client.stub.push(
-            flowOfRequests
+            requestFlow
         )
     }
 }

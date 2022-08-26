@@ -33,7 +33,7 @@ class TailRequest(
                 .build()
         )
         val needToWait = AtomicBoolean(true)
-        val flowOfRequests = flow {
+        val requestFlow = flow {
             listOfRequests.forEach {
                 if(it.hasStop()) {
                     withTimeoutOrNull(timeout.toMillis()) {
@@ -41,14 +41,14 @@ class TailRequest(
                             delay(timeMillis = 100L)
                         }
                     }
-                    needToWait.getAndSet(false)
+                    needToWait.set(false)
                 }
-                log.info { "Sending $it" }
+                log.info { "Sending: $it" }
                 emit(it)
             }
         }
         val response = client.stub.tail(
-            flowOfRequests
+            requestFlow
         )
         val data = StringBuilder()
         response.catch{ log.error { it.message } }.takeWhile { needToWait.get() }.collect{

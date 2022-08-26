@@ -15,4 +15,14 @@ sealed class PayloadRequestBody {
             )
         ).build()
     }
+
+    class DataPayload(file: File): PayloadRequestBody() {
+        override val requestBody: Payload = Payload.newBuilder()
+            .setData(
+                ByteString.copyFrom(
+                    FileUtils.readFileToByteArray(file)
+                )
+            )
+            .build()
+    }
 }
