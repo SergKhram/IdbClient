@@ -30,13 +30,15 @@ class LogRequest(
         )
         val logs = mutableListOf<String>()
         coroutineScope {
-            val job = async {
+            val asyncJob = async {
                 response.cancellable().takeWhileCondition {
                     it.output.toStringUtf8().takeIf { str -> !str.contains("Send frame of log") }?.let(logs::add)
                 }
             }
-            job.await()
-            job.cancel()
+            asyncJob.let {
+                it.await()
+                it.cancel()
+            }
         }
         return logs
     }
