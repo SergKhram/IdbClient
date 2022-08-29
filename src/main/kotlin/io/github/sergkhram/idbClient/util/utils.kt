@@ -25,6 +25,9 @@ internal val cmdBuilder: (List<String>) -> ProcessBuilder = {
 internal fun compress(srcPath: String): Path {
     val zipPath = kotlin.io.path.createTempFile(suffix = ".zip")
     val srcFile = File(srcPath)
-    if(srcFile.isDirectory) ZipUtil.pack(srcFile, zipPath.toFile()) else ZipUtil.packEntry(srcFile, zipPath.toFile())
+    if(srcFile.isDirectory)
+        ZipUtil.pack(srcFile, zipPath.toFile())
+    else
+        ZipUtil.packEntry(srcFile, zipPath.toFile())
     return zipPath
 }
