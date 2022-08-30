@@ -2,6 +2,7 @@ package io.github.sergkhram.idbClient.requests.media
 
 import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.requests.IdbRequest
+import io.github.sergkhram.idbClient.util.unpackGzip
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -9,14 +10,16 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.time.Duration
+import kotlin.io.path.deleteIfExists
+
 
 /**
  * Record the target's screen to a mp4 video file
- * @param zipFile - zip file to output the video to (you should to unpack it to *.mp4)
+ * @param file - file to output the video to (should be with extension: *.mp4)
  */
 class RecordRequest(
     private val predicate: () -> Boolean,
-    private val zipFile: File,
+    private val file: File,
     val timeout: Duration = Duration.ofSeconds(10L),
 ): IdbRequest<File>() {
     override suspend fun execute(client: GrpcClient): File {
@@ -52,7 +55,12 @@ class RecordRequest(
         response.catch{ log.error { it.message } }.collect{
             data += it.payload.data.toByteArray()
         }
-        FileUtils.writeByteArrayToFile(zipFile, data)
-        return zipFile
+
+        val gzipFile = kotlin.io.path.createTempFile(suffix = ".gz")
+        FileUtils.writeByteArrayToFile(gzipFile.toFile(), data)
+        unpackGzip(gzipFile.toFile(), file.toPath())
+        gzipFile.deleteIfExists()
+
+        return file
     }
 }
