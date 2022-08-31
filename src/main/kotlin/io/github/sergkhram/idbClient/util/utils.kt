@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import idb.TargetDescription
 import org.zeroturnaround.zip.ZipUtil
 import java.io.File
+import java.io.FileInputStream
 import java.nio.file.Path
+import java.util.zip.GZIPInputStream
 
 internal fun JsonNode.convertJsonNodeToTargetDescription() = TargetDescription.newBuilder()
     .setUdid(this.get("udid").asText())
@@ -30,4 +32,10 @@ internal fun compress(srcPath: String): Path {
     else
         ZipUtil.packEntry(srcFile, zipPath.toFile())
     return zipPath
+}
+
+internal fun unpackGzip(gzipFile: File): ByteArray {
+    return GZIPInputStream(
+        FileInputStream(gzipFile)
+    ).use(GZIPInputStream::readAllBytes)
 }
