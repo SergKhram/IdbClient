@@ -5,7 +5,6 @@ import idb.TargetDescription
 import org.zeroturnaround.zip.ZipUtil
 import java.io.File
 import java.io.FileInputStream
-import java.nio.file.Files
 import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 
@@ -35,8 +34,8 @@ internal fun compress(srcPath: String): Path {
     return zipPath
 }
 
-internal fun unpackGzip(gzipFile: File, destFilePath: Path) {
-    GZIPInputStream(
+internal fun unpackGzip(gzipFile: File): ByteArray {
+    return GZIPInputStream(
         FileInputStream(gzipFile)
-    ).use { gis -> Files.copy(gis, destFilePath) }
+    ).use(GZIPInputStream::readAllBytes)
 }

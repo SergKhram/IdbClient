@@ -8,21 +8,18 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withTimeoutOrNull
 import org.apache.commons.io.FileUtils
-import java.io.File
 import java.time.Duration
 import kotlin.io.path.deleteIfExists
 
 
 /**
- * Record the target's screen to a mp4 video file
- * @param file - file to output the video to (should be with extension: *.mp4)
+ * Record the target's screen to a mp4 video file and return byte array
  */
 class RecordRequest(
     private val predicate: () -> Boolean,
-    private val file: File,
     val timeout: Duration = Duration.ofSeconds(10L),
-): IdbRequest<File>() {
-    override suspend fun execute(client: GrpcClient): File {
+): IdbRequest<ByteArray>() {
+    override suspend fun execute(client: GrpcClient): ByteArray {
         val listOfRequests = listOf(
             idb.RecordRequest.newBuilder()
                 .setStart(
@@ -58,9 +55,9 @@ class RecordRequest(
 
         val gzipFile = kotlin.io.path.createTempFile(suffix = ".gz")
         FileUtils.writeByteArrayToFile(gzipFile.toFile(), data)
-        unpackGzip(gzipFile.toFile(), file.toPath())
+        val bytes = unpackGzip(gzipFile.toFile())
         gzipFile.deleteIfExists()
 
-        return file
+        return bytes
     }
 }
