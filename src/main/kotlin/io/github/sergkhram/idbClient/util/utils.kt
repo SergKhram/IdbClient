@@ -45,7 +45,7 @@ internal fun unpackGzip(gzipFile: File): ByteArray {
     ).use(GZIPInputStream::readAllBytes)
 }
 
-internal fun unpackBytes(data: ByteArray): ByteArray {
+fun unpackBytes(data: ByteArray): ByteArray {
     val gzipFile = kotlin.io.path.createTempFile(suffix = ".gz")
     FileUtils.writeByteArrayToFile(gzipFile.toFile(), data)
     val bytes = unpackGzip(gzipFile.toFile())
@@ -53,22 +53,19 @@ internal fun unpackBytes(data: ByteArray): ByteArray {
     return bytes
 }
 
-suspend fun Flow<ByteArray>.exportFile(dstPath: String): File {
+/**
+ * @param transformFunc - if bytes data from flow is compressed you can use this param to unpack this data before
+ * creating file
+ */
+suspend fun Flow<ByteArray>.exportFile(
+    dstPath: String,
+    transformFunc: (ByteArray) -> ByteArray = { bytes -> bytes }
+): File {
     var bytes: ByteArray = byteArrayOf()
     this.catch{ KLogger.logger.error { it.message } }.collect {
         bytes += it
     }
     val exportFile = File(dstPath)
-    FileUtils.writeByteArrayToFile(exportFile, bytes)
-    return exportFile
-}
-
-suspend fun Flow<ByteArray>.exportFileWUnpack(dstPath: String): File {
-    var compressedData: ByteArray = byteArrayOf()
-    this.catch{ KLogger.logger.error { it.message } }.collect {
-        compressedData += it
-    }
-    val exportFile = File(dstPath)
-    FileUtils.writeByteArrayToFile(exportFile, unpackBytes(compressedData))
+    FileUtils.writeByteArrayToFile(exportFile, transformFunc.invoke(bytes))
     return exportFile
 }
