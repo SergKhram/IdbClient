@@ -2,11 +2,16 @@ package io.github.sergkhram.idbClient.util
 
 import com.fasterxml.jackson.databind.JsonNode
 import idb.TargetDescription
+import io.github.sergkhram.idbClient.logs.KLogger
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import org.apache.commons.io.FileUtils
 import org.zeroturnaround.zip.ZipUtil
 import java.io.File
 import java.io.FileInputStream
 import java.nio.file.Path
 import java.util.zip.GZIPInputStream
+import kotlin.io.path.deleteIfExists
 
 internal fun JsonNode.convertJsonNodeToTargetDescription() = TargetDescription.newBuilder()
     .setUdid(this.get("udid").asText())
@@ -38,4 +43,29 @@ internal fun unpackGzip(gzipFile: File): ByteArray {
     return GZIPInputStream(
         FileInputStream(gzipFile)
     ).use(GZIPInputStream::readAllBytes)
+}
+
+fun unpackBytes(data: ByteArray): ByteArray {
+    val gzipFile = kotlin.io.path.createTempFile(suffix = ".gz")
+    FileUtils.writeByteArrayToFile(gzipFile.toFile(), data)
+    val bytes = unpackGzip(gzipFile.toFile())
+    gzipFile.deleteIfExists()
+    return bytes
+}
+
+/**
+ * @param transformFunc - if bytes data from flow is compressed you can use this param to unpack this data before
+ * creating file
+ */
+suspend fun Flow<ByteArray>.exportFile(
+    dstPath: String,
+    transformFunc: (ByteArray) -> ByteArray = { bytes -> bytes }
+): File {
+    var bytes: ByteArray = byteArrayOf()
+    this.catch{ KLogger.logger.error { it.message } }.collect {
+        bytes += it
+    }
+    val exportFile = File(dstPath)
+    FileUtils.writeByteArrayToFile(exportFile, transformFunc.invoke(bytes))
+    return exportFile
 }
