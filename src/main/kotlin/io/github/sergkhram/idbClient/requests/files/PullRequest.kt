@@ -14,7 +14,6 @@ class PullRequest(private val srcPath: String, private val container: FileContai
                 .setContainer(
                     container.toFileContainerProto()
                 )
-                .setDstPath(null)
                 .setSrcPath(srcPath)
                 .build()
         ).map { it.payload.data.toByteArray() }
