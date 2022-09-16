@@ -1,0 +1,35 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Install Java and Maven
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: Prepare to publish basic
+        run: |
+          echo '${{secrets.GPG_KEY_CONTENTS}}' | base64 -d > publish_key.gpg
+          gpg --quiet --batch --yes --decrypt --passphrase="${{secrets.SECRET_PASSPHRASE}}" \
+          --output secret.gpg publish_key.gpg
+
+      - name: Print gpg
+        run: |
+          gpg --list-secret-keys
+#      - name: Release Maven package
+#        uses: samuelmeuli/action-maven-publish@v1
+#        with:
+#          gpg_private_key: ${{ secrets.GPG_KEY_CONTENTS }}
+#          gpg_passphrase: ${{ secrets.SECRET_PASSPHRASE }}
+#          nexus_username: ${{ secrets.SONATYPE_USERNAME }}
+#          nexus_password: ${{ secrets.SONATYPE_PASSWORD }}
