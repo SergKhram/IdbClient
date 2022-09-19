@@ -1,6 +1,7 @@
 package io.github.sergkhram.idbClient.requests.media
 
 import io.github.sergkhram.idbClient.entities.GrpcClient
+import io.github.sergkhram.idbClient.entities.response.VideoResponse
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.util.unpackBytes
 import kotlinx.coroutines.delay
@@ -16,8 +17,8 @@ import java.time.Duration
 class RecordRequest(
     private val predicate: () -> Boolean,
     val timeout: Duration = Duration.ofSeconds(10L)
-): IdbRequest<ByteArray>() {
-    override suspend fun execute(client: GrpcClient): ByteArray {
+): IdbRequest<VideoResponse>() {
+    override suspend fun execute(client: GrpcClient): VideoResponse {
         val listOfRequests = listOf(
             idb.RecordRequest.newBuilder()
                 .setStart(
@@ -51,6 +52,8 @@ class RecordRequest(
             data += it.payload.data.toByteArray()
         }
 
-        return unpackBytes(data)
+        return VideoResponse(
+            unpackBytes(data)
+        )
     }
 }
