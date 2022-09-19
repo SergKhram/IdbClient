@@ -1,4 +1,7 @@
 # IdbClient
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.sergkhram/idbclient.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22io.github.sergkhram%22%20AND%20a:%22idbclient%22)
+[![License](https://img.shields.io/badge/License-Apache%202.0-purple.svg)](https://opensource.org/licenses/Apache-2.0)
+
 It is the way to get access to the idb programmatically, using kotlin. You can control Apple devices and simulators from 
 your code with this client, which creates a connection to them by grpc. All you need to set up is to install the idb companion
 (https://fbidb.io/docs/installation) on your Mac and run it. You can use idb client connection from any architecture.
@@ -7,15 +10,23 @@ your code with this client, which creates a connection to them by grpc. All you 
 We provide commands' wrappers to functionality of idb companion(you can check the full list here https://fbidb.io/docs/commands)
 
 ## How to
-1. Create idbClient: 
+1. Import library from maven:
+```
+<dependency>
+  <groupId>io.github.sergkhram</groupId>
+  <artifactId>idbclient</artifactId>
+  <version>0.0.1-RELEASE</version>
+</dependency>
+```
+2. Create idbClient: 
 ```
 val idb = IOSDebugBridgeClient()
 ```
-2. Connect companion:
+3. Connect companion:
 ```
 val udid = idb.connectToCompanion(TcpAddress("127.0.0.1", 10882))
 ```
-3. Execute request:
+4. Execute request:
 ```
 val result = idb.execute(
     LogRequest(
