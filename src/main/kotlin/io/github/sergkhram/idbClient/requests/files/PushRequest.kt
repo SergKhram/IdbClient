@@ -11,11 +11,17 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlin.io.path.deleteIfExists
 
-
+/**
+ * Copy file(s) from local machine to target
+ * @param srcPath - Path of file(s) to copy to the target
+ * @param dstPath - Directory relative to the data container of the application to copy the files into.
+ * Will be created if non-existent.
+ * @param container - File container(Default is ROOT)
+ */
 class PushRequest(
-    private val dstPath: String,
     private val srcPath: String,
-    val container: FileContainer
+    private val dstPath: String,
+    val container: FileContainer = FileContainer()
 ): IdbRequest<PushResponse>(){
     override suspend fun execute(client: GrpcClient): PushResponse {
         val zipPath = compress(srcPath)

@@ -10,9 +10,14 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Tails a remote file
+ * @param path - Relative container source path
+ * @param container - File container(Default is ROOT)
+ */
 class TailRequest(
-    val container: FileContainer,
     val path: String,
+    val container: FileContainer = FileContainer(),
     private val predicate: () -> Boolean,
     val timeout: Duration = Duration.ofSeconds(10L)
 ): IdbRequest<String>() {
