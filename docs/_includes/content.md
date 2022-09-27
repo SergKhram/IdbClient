@@ -3,9 +3,9 @@
 <a href="https://opensource.org/licenses/Apache-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-purple.svg" alt="License" /></a></p>
 
 <p><strong>IdbClient</strong></p>
-<blockquote><p>It is the way to get access to the idb programmatically, using kotlin. You can control Apple devices and simulators from
+<p>It is the way to get access to the idb programmatically, using kotlin. You can control Apple devices and simulators from
 your code with this client, which creates a connection to them by grpc. All you need to set up is to install the idb companion
-(https://fbidb.io/docs/installation) on your Mac and run it. You can use idb client connection from any architecture.</p></blockquote>
+(https://fbidb.io/docs/installation) on your Mac and run it. You can use idb client connection from any architecture.</p>
 
 <p>We provide commands' wrappers to functionality of idb companion(you can check the full list here https://fbidb.io/docs/commands)</p>
 
