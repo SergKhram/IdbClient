@@ -32,7 +32,7 @@
 
 <h2 style="color:#444;">Terminate request</h2>
 <blockquote>
-  <p><strong>List apps request</strong>(https://fbidb.io/docs/commands#kill-a-running-app) - Terminate a running application. Example: 
+  <p><strong>Terminate request</strong>(https://fbidb.io/docs/commands#kill-a-running-app) - Terminate a running application. Example: 
 <pre class="highlight"><code class="language-plaintext highlighter-rouge">idb.execute(
     TerminateRequest(
         bundleId //Bundle id of the app to terminate
