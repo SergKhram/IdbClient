@@ -12,8 +12,8 @@
             waitFor, //Wait for the process to exit, tailing all output from the app
             waitForDebugger, //Suspend application right after the launch to facilitate attaching of a debugger (ex, lldb).
         ),
-        predicate = {false}, 
-        timeout = Duration.ofSeconds(10)
+        predicate = {false}, //Executing until this become true or timeout
+        timeout = Duration.ofSeconds(10) //Executing until predicate become true or timeout
     ),
     udid
 )</code></pre></p>
