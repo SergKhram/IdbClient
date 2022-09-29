@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.requests.management
+package io.github.sergkhram.idbClient.requests.app
 
 import idb.InstallRequest
 import idb.InstallResponse
