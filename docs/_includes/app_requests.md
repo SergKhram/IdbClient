@@ -51,3 +51,16 @@
     udid
 )</code></pre></p>
 </blockquote>
+
+<h2 style="color:#444;">Install Request</h2>
+<blockquote>
+  <p><strong>Install Request</strong>(https://fbidb.io/docs/commands/#install-an-app)- Installs the given .app or .ipa. The app target architecture should match that of the target. Example: 
+<pre class="highlight"><code class="language-plaintext highlighter-rouge">idb.execute(
+    InstallRequest(
+        bundlePath, //Path to the .app/.ipa to install. Note that .app bundles will usually be faster to install than .ipa files.
+        makeDebuggable, //If set, will persist the application bundle alongside the iOS Target, this is needed for debugserver commands to function
+        overrideMtime - If set, idb will disregard the mtime of files contained in an .ipa file. Current timestamp will be used as modification time. Use this flag to ensure app updates work properly when your build system normalises the timestamps of contents of archives.
+    ),
+    udid
+)</code></pre></p>
+</blockquote>

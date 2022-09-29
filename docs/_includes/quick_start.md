@@ -1,10 +1,10 @@
 <h1 id="quick-start" style="color:#333;">Quick start</h1>
 <h3 style="color:#444;">Add IdbClient dependency</h3>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code><&#0dependency>
-  <&#0groupId>io.github.sergkhram<&#0/groupId>
-  <&#0artifactId>idbclient<&#0/artifactId>
-  <&#0version>0.0.2-RELEASE<&#0/version>
-<&#0/dependency>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.github.sergkhram&lt;/groupId&gt;
+  &lt;artifactId&gt;idbclient&lt;/artifactId&gt;
+  &lt;version&gt;0.0.2-RELEASE&lt;/version&gt;
+&lt;/dependency&gt;
 </code></pre></div></div>
 <h3 style="color:#444;">Create idbClient</h3>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>val idb = IOSDebugBridgeClient()
