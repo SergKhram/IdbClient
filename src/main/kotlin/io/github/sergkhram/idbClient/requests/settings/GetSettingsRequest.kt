@@ -6,7 +6,7 @@ import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.entities.requestsBody.settings.SettingType
 import io.github.sergkhram.idbClient.requests.IdbRequest
 
-class GetSettingsRequest(private val settingType: SettingType): IdbRequest<ListSettingResponse>() {
+class GetSettingsRequest(private val settingType: SettingType = SettingType.LOCALE): IdbRequest<ListSettingResponse>() {
     override suspend fun execute(client: GrpcClient): ListSettingResponse {
         return client.stub.listSettings(
             ListSettingRequest.newBuilder().setSettingValue(settingType.value).build()

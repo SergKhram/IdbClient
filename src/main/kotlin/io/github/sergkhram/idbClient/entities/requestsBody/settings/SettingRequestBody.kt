@@ -33,7 +33,7 @@ sealed class SettingRequestBody {
      * Example of usage: idb set --domain com.apple.suggestions.plist SuggestionsAppLibraryEnabled --type bool true
      * @param domain - Preference domain, assumed to be Apple Global Domain if not specified
      */
-    data class AnySetting(val name: String, val value: String, val valueType: String, val domain: String?) :
+    data class AnySetting(val name: String, val value: String, val valueType: String, val domain: String = "") :
         SettingRequestBody() {
         override val requestBody: SettingRequest = SettingRequest.newBuilder().setStringSetting(
             SettingRequest.StringSetting.newBuilder()
