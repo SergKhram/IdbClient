@@ -1,19 +1,18 @@
 package io.github.sergkhram.idbClient.requests.management
 
-import idb.DebugServerRequest
 import idb.DebugServerResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.entities.requestsBody.management.DebugServerRequestBody
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flow
 
-class DebugServerRequest(private val requestBody: Flow<DebugServerRequest>): AsyncIdbRequest<Flow<DebugServerResponse>>() {
-    constructor(requestBody: List<DebugServerRequestBody>) : this(requestBody.map { it.requestBody }.asFlow())
-
+class DebugServerRequest(private val debugRequestBodyObject: DebugServerRequestBody): AsyncIdbRequest<Flow<DebugServerResponse>>() {
     override suspend fun execute(client: GrpcClient): Flow<DebugServerResponse> {
         return client.stub.debugserver(
-            requestBody
+            flow {
+                emit(debugRequestBodyObject.requestBody)
+            }
         )
     }
 }
