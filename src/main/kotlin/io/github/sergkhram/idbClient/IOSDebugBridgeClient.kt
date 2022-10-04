@@ -2,12 +2,12 @@ package io.github.sergkhram.idbClient
 
 import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
-import idb.TargetDescription
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
 import io.github.sergkhram.idbClient.Const.localTargetsListCmd
 import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
 import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
 import io.github.sergkhram.idbClient.entities.*
+import io.github.sergkhram.idbClient.entities.response.TargetDescriptionKtResponse
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
@@ -116,11 +116,12 @@ class IOSDebugBridgeClient(
         } ?: throw noCompanionWithUdid(udid)
     }
 
-    suspend fun getTargetsList(): List<TargetDescription> {
+    suspend fun getTargetsList(): List<TargetDescriptionKtResponse> {
         return clients.pMap { client ->
             try {
                 GrpcClient(client.value.channelBuilder, client.value.isLocal).use { grpcClient ->
-                    DescribeRequest().execute(grpcClient).targetDescription
+                    val describeResponse = DescribeRequest().execute(grpcClient)
+                    TargetDescriptionKtResponse(describeResponse, client.value.address)
                 }
             } catch (e: StatusException) {
                 log.info("Connection refused for ${client.key}", e)
@@ -155,7 +156,7 @@ class IOSDebugBridgeClient(
                 )
             }
             udid = connectionResponse.companion.udid
-            clients[udid] = CompanionData(remoteChannelBuilder)
+            clients[udid] = CompanionData(remoteChannelBuilder, address = address)
             log.debug("Connecting $address companion finished")
         } catch (e: StatusException) {
             val addressString = if(address is TcpAddress) {
@@ -169,9 +170,23 @@ class IOSDebugBridgeClient(
     }
 
     fun disconnectCompanion(udid: String) {
-        log.debug("Disconnecting $udid companion started")
-        clients.takeIf { it.containsKey(udid) }?.remove(udid)
-        log.debug("Disconnecting $udid companion finished")
+        clients.takeIf { it.containsKey(udid) }?.let {
+            log.debug("Disconnecting $udid companion started")
+            it.remove(udid)
+            log.debug("Disconnecting $udid companion finished")
+        }
+    }
+
+    fun disconnectCompanion(host: String?, port: Int?) {
+        clients.entries.firstOrNull {
+            it.value.address?.let { address ->
+                address is TcpAddress && address.host == host && address.port == port
+            } ?: false
+        }?.let { entry ->
+            log.debug("Disconnecting $host:$port companion started")
+            clients.remove(entry.key)
+            log.debug("Disconnecting $host:$port companion finished")
+        }
     }
 
     private suspend fun <K, V, B> ConcurrentHashMap<K, V>.pMap(f: suspend (Map.Entry<K, V>) -> B?): List<B?> = coroutineScope {
