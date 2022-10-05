@@ -7,7 +7,7 @@ import io.github.sergkhram.idbClient.Const.localTargetsListCmd
 import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
 import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
 import io.github.sergkhram.idbClient.entities.*
-import io.github.sergkhram.idbClient.entities.response.TargetDescriptionKtResponse
+import io.github.sergkhram.idbClient.entities.response.DescribeKtResponse
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
@@ -116,12 +116,12 @@ class IOSDebugBridgeClient(
         } ?: throw noCompanionWithUdid(udid)
     }
 
-    suspend fun getTargetsList(): List<TargetDescriptionKtResponse> {
+    suspend fun getTargetsList(): List<DescribeKtResponse> {
         return clients.pMap { client ->
             try {
                 GrpcClient(client.value.channelBuilder, client.value.isLocal).use { grpcClient ->
                     val describeResponse = DescribeRequest().execute(grpcClient)
-                    TargetDescriptionKtResponse(describeResponse, client.value.address)
+                    DescribeKtResponse(describeResponse, client.value.address)
                 }
             } catch (e: StatusException) {
                 log.info("Connection refused for ${client.key}", e)
