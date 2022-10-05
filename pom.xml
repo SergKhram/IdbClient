@@ -5,7 +5,7 @@
     <groupId>io.github.sergkhram</groupId>
     <artifactId>idbclient</artifactId>
     <name>IdbClient</name>
-    <version>0.0.2-RELEASE</version>
+    <version>0.0.3-RELEASE</version>
     <packaging>jar</packaging>
     <description>IdbClient is kotlin-like client, created to connect and control Apple devices and simulators</description>
     <url>https://github.com/SergKhram/IdbClient</url>
@@ -40,7 +40,7 @@
         <maven.compiler.target>11</maven.compiler.target>
         <grpc.version>1.45.0</grpc.version>
         <grpc.kotlin.version>1.3.0</grpc.kotlin.version>
-        <protobuf.version>3.19.4</protobuf.version>
+        <protobuf.version>3.19.6</protobuf.version>
 
     </properties>
 
