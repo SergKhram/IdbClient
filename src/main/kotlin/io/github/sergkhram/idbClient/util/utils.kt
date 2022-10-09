@@ -2,7 +2,15 @@ package io.github.sergkhram.idbClient.util
 
 import com.fasterxml.jackson.databind.JsonNode
 import idb.TargetDescription
+import io.github.sergkhram.idbClient.entities.Address
+import io.github.sergkhram.idbClient.entities.DomainSocketAddress
+import io.github.sergkhram.idbClient.entities.TcpAddress
 import io.github.sergkhram.idbClient.logs.KLogger
+import io.grpc.ManagedChannel
+import io.grpc.ManagedChannelBuilder
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import org.apache.commons.io.FileUtils
@@ -68,4 +76,24 @@ suspend fun Flow<ByteArray>.exportFile(
     val exportFile = File(dstPath)
     FileUtils.writeByteArrayToFile(exportFile, transformFunc.invoke(bytes))
     return exportFile
+}
+
+fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.IO): ManagedChannel {
+    return if (address is TcpAddress) {
+        ManagedChannelBuilder.forAddress(address.host, address.port).usePlaintext()
+            .executor(dispatcher.asExecutor()).build()
+    } else {
+        address as DomainSocketAddress
+        ManagedChannelBuilder.forTarget(address.path).usePlaintext()
+            .executor(dispatcher.asExecutor())
+            .build()
+    }
+}
+
+fun Address.asString(): String {
+    return if(this is TcpAddress) {
+        "$host:$port"
+    } else {
+        (this as DomainSocketAddress).path
+    }
 }
