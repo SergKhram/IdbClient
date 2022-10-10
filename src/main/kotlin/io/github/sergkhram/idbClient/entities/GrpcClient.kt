@@ -56,10 +56,8 @@ internal class GrpcClient(
     @PreDestroy
     override fun close() {
         log.debug("Started gRPC client ${this.hashCode()} shutdown")
-        if(companionData.isLocal) {
-            process?.takeIf { it.isAlive }?.destroy()
-        }
-        channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+        if(companionData.isLocal) process?.takeIf { it.isAlive }?.destroy()
+        if(this::channel.isInitialized) channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
         log.debug("Completed gRPC client ${this.hashCode()} shutdown")
     }
 
