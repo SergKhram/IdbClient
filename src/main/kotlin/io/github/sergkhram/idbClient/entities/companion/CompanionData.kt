@@ -1,5 +1,5 @@
 package io.github.sergkhram.idbClient.entities.companion
 
-interface CompanionData {
+internal interface CompanionData {
     val isLocal: Boolean
 }

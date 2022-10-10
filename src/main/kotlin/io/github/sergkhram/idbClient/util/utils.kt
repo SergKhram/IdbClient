@@ -21,7 +21,7 @@ import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 import kotlin.io.path.deleteIfExists
 
-internal fun JsonNode.convertJsonNodeToTargetDescription() = TargetDescription.newBuilder()
+internal fun JsonNode.convertToTargetDescription() = TargetDescription.newBuilder()
     .setUdid(this.get("udid").asText())
     .setName(this.get("name").asText())
     .setState(this.get("state").asText())
@@ -97,3 +97,5 @@ fun Address.asString(): String {
         (this as DomainSocketAddress).path
     }
 }
+
+fun isStartedOnMac() = System.getProperty("os.name").contains("mac", ignoreCase = true)

@@ -15,10 +15,9 @@ import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
-import io.github.sergkhram.idbClient.util.JsonUtil
-import io.github.sergkhram.idbClient.util.asString
+import io.github.sergkhram.idbClient.util.*
 import io.github.sergkhram.idbClient.util.cmdBuilder
-import io.github.sergkhram.idbClient.util.convertJsonNodeToTargetDescription
+import io.github.sergkhram.idbClient.util.convertToTargetDescription
 import io.grpc.StatusException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +44,7 @@ class IOSDebugBridgeClient(
             }
         }
         if (withLocal
-            && System.getProperty("os.name").contains("mac", ignoreCase = true)
+            && isStartedOnMac()
             && File(localIdbCompanionPath).exists()
         ) {
             var proc: Process? = null
@@ -63,11 +62,12 @@ class IOSDebugBridgeClient(
                     }]"
                 )
 
-                val localTargets = (outputAsJsonNode as ArrayNode?)?.map { it.convertJsonNodeToTargetDescription() }
-                localTargets?.forEach { target ->
-                    target.let {
-                        clients[it.udid] = LocalCompanionData(it.udid)
+                val localTargets = (outputAsJsonNode as ArrayNode?)
+                    ?.map {
+                        it.convertToTargetDescription()
                     }
+                localTargets?.forEach { target ->
+                    clients[target.udid] = LocalCompanionData(target.udid)
                 }
             } catch (e: IOException) {
                 log.info(e.localizedMessage, e)
