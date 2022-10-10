@@ -1,3 +1,5 @@
 package io.github.sergkhram.idbClient.entities.address
 
-interface Address
+sealed interface Address {
+    fun asString(): String
+}

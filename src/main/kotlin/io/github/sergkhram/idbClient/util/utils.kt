@@ -90,12 +90,4 @@ fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Di
     }
 }
 
-fun Address.asString(): String {
-    return if(this is TcpAddress) {
-        "$host:$port"
-    } else {
-        (this as DomainSocketAddress).path
-    }
-}
-
 fun isStartedOnMac() = System.getProperty("os.name").contains("mac", ignoreCase = true)
