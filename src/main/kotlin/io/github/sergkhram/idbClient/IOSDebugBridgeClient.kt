@@ -131,7 +131,7 @@ class IOSDebugBridgeClient(
     }
 
     suspend fun connectToCompanion(address: Address, dispatcher: CoroutineDispatcher = this.dispatcher): String? {
-        log.debug("Connecting ${address.asString()} companion started")
+        log.debug("Connecting $address companion started")
         var udid: String? = null
         val remoteCompanionData = RemoteCompanionData(address)
         try {
@@ -143,9 +143,9 @@ class IOSDebugBridgeClient(
             }
             udid = connectionResponse.companion.udid
             clients[udid] = remoteCompanionData
-            log.debug("Connecting ${address.asString()} companion finished")
+            log.debug("Connecting $address companion finished")
         } catch (e: StatusException) {
-            log.info("Connection refused for ${address.asString()}", e)
+            log.info("Connection refused for $address", e)
         }
         return udid
     }
