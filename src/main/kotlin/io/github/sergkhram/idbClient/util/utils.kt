@@ -2,9 +2,9 @@ package io.github.sergkhram.idbClient.util
 
 import com.fasterxml.jackson.databind.JsonNode
 import idb.TargetDescription
-import io.github.sergkhram.idbClient.entities.Address
-import io.github.sergkhram.idbClient.entities.DomainSocketAddress
-import io.github.sergkhram.idbClient.entities.TcpAddress
+import io.github.sergkhram.idbClient.entities.address.Address
+import io.github.sergkhram.idbClient.entities.address.DomainSocketAddress
+import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder

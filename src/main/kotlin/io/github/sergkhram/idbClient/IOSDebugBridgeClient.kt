@@ -6,6 +6,8 @@ import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
 import io.github.sergkhram.idbClient.Const.localTargetsListCmd
 import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
 import io.github.sergkhram.idbClient.entities.*
+import io.github.sergkhram.idbClient.entities.address.Address
+import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData

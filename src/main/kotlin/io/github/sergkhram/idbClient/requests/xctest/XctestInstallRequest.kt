@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.flow
 import java.io.File
 
 /**
- * Install an xctest
+ * Install a xctest
  * @param testBundlePath - Bundle path of the test bundle
  */
 class XctestInstallRequest(

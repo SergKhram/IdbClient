@@ -1,3 +1,3 @@
-package io.github.sergkhram.idbClient.entities
+package io.github.sergkhram.idbClient.entities.address
 
 class DomainSocketAddress(val path: String) : Address

@@ -1,3 +1,3 @@
-package io.github.sergkhram.idbClient.entities
+package io.github.sergkhram.idbClient.entities.address
 
 class TcpAddress(val host: String, val port: Int) : Address

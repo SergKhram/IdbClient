@@ -35,7 +35,7 @@ sealed class LaunchRequestBody {
             .build()
     }
 
-    internal class StopLaunchRequestBody(): LaunchRequestBody(){
+    internal class StopLaunchRequestBody: LaunchRequestBody(){
         override val requestBody: LaunchRequest = LaunchRequest.newBuilder()
             .setStop(
                 LaunchRequest.Stop.getDefaultInstance()

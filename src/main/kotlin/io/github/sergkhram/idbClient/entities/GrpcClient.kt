@@ -4,6 +4,7 @@ import idb.CompanionServiceGrpcKt
 import io.github.sergkhram.idbClient.Const.localGrpcStartTimeout
 import io.github.sergkhram.idbClient.Const.localHost
 import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
+import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
