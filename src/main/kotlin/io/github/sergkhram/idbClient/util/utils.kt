@@ -2,7 +2,15 @@ package io.github.sergkhram.idbClient.util
 
 import com.fasterxml.jackson.databind.JsonNode
 import idb.TargetDescription
+import io.github.sergkhram.idbClient.entities.address.Address
+import io.github.sergkhram.idbClient.entities.address.DomainSocketAddress
+import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.logs.KLogger
+import io.grpc.ManagedChannel
+import io.grpc.ManagedChannelBuilder
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import org.apache.commons.io.FileUtils
@@ -13,7 +21,7 @@ import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 import kotlin.io.path.deleteIfExists
 
-internal fun JsonNode.convertJsonNodeToTargetDescription() = TargetDescription.newBuilder()
+internal fun JsonNode.convertToTargetDescription() = TargetDescription.newBuilder()
     .setUdid(this.get("udid").asText())
     .setName(this.get("name").asText())
     .setState(this.get("state").asText())
@@ -32,7 +40,7 @@ internal val cmdBuilder: (List<String>) -> ProcessBuilder = {
 internal fun compress(srcPath: String): Path {
     val zipPath = kotlin.io.path.createTempFile(suffix = ".zip")
     val srcFile = File(srcPath)
-    if(srcFile.isDirectory)
+    if (srcFile.isDirectory)
         ZipUtil.pack(srcFile, zipPath.toFile())
     else
         ZipUtil.packEntry(srcFile, zipPath.toFile())
@@ -62,10 +70,34 @@ suspend fun Flow<ByteArray>.exportFile(
     transformFunc: (ByteArray) -> ByteArray = { bytes -> bytes }
 ): File {
     var bytes: ByteArray = byteArrayOf()
-    this.catch{ KLogger.logger.error { it.message } }.collect {
+    this.catch { KLogger.logger.error { it.message } }.collect {
         bytes += it
     }
     val exportFile = File(dstPath)
     FileUtils.writeByteArrayToFile(exportFile, transformFunc.invoke(bytes))
     return exportFile
 }
+
+fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.IO): ManagedChannel {
+    val managedChannelBuilder = when (address) {
+        is TcpAddress -> ManagedChannelBuilder.forAddress(address.host, address.port)
+        is DomainSocketAddress -> ManagedChannelBuilder.forTarget(address.path)
+    }
+    return managedChannelBuilder
+        .usePlaintext()
+        .executor(
+            dispatcher.asExecutor()
+        )
+        .build()
+}
+
+fun isStartedOnMac() = System.getProperty("os.name").contains("mac", ignoreCase = true)
+
+fun String.beautifyJsonString() = JsonUtil.convertStringToJsonNode(
+    "[${
+        this.replace(
+            "}\n" +
+                    "{", "},{"
+        )
+    }]"
+)

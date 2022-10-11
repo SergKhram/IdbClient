@@ -16,15 +16,15 @@ import java.io.File
  * @param bundlePath - Path to the .app/.ipa to install. Note that .app bundles will usually be faster to install than
  * .ipa files.
  * @param makeDebuggable - If set, will persist the application bundle alongside the iOS Target, this is needed for
- * debugserver commands to function
- * @param overrideMtime - If set, idb will disregard the mtime of files contained in an .ipa file. Current timestamp
+ * debug server commands to function
+ * @param overrideMTime - If set, idb will disregard the mtime of files contained in an .ipa file. Current timestamp
  * will be used as modification time. Use this flag to ensure app updates work properly when your build system
  * normalises the timestamps of contents of archives.
  */
 class InstallRequest(
     private val bundlePath: String,
     private val makeDebuggable: Boolean = false,
-    private val overrideMtime: Boolean = false
+    private val overrideMTime: Boolean = false
 ): AsyncIdbRequest<Flow<InstallResponse>>() {
     override suspend fun execute(client: GrpcClient): Flow<InstallResponse> {
         val listOfRequests = mutableListOf(
@@ -37,7 +37,7 @@ class InstallRequest(
                 InstallRequest.newBuilder().setMakeDebuggable(true).build()
             )
         }
-        if(overrideMtime) {
+        if(overrideMTime) {
             listOfRequests.add(
                 InstallRequest.newBuilder().setOverrideModificationTime(true).build()
             )

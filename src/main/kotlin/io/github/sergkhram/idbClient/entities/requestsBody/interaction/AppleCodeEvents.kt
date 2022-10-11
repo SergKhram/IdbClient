@@ -4,7 +4,7 @@ import idb.HIDEvent
 import idb.HIDEvent.HIDKey
 
 object AppleCodeEvents {
-    val mapOfCodes = mapOf<Char, List<HIDEvent>>(
+    val mapOfCodes = mapOf(
         'a' to prepareKeyEvent(4),
         'b' to prepareKeyEvent(5),
         'c' to prepareKeyEvent(6),

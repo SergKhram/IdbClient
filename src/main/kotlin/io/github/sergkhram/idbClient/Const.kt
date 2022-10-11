@@ -9,4 +9,6 @@ object Const {
     val noCompanionWithUdid: (String) -> NoSuchElementException = {
         NoSuchElementException("There is no companion with udid $it")
     }
+    const val localHost = "127.0.0.1"
+    const val localGrpcStartTimeout = 5000L
 }
