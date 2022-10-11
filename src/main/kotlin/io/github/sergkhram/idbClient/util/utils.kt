@@ -40,7 +40,7 @@ internal val cmdBuilder: (List<String>) -> ProcessBuilder = {
 internal fun compress(srcPath: String): Path {
     val zipPath = kotlin.io.path.createTempFile(suffix = ".zip")
     val srcFile = File(srcPath)
-    if(srcFile.isDirectory)
+    if (srcFile.isDirectory)
         ZipUtil.pack(srcFile, zipPath.toFile())
     else
         ZipUtil.packEntry(srcFile, zipPath.toFile())
@@ -70,7 +70,7 @@ suspend fun Flow<ByteArray>.exportFile(
     transformFunc: (ByteArray) -> ByteArray = { bytes -> bytes }
 ): File {
     var bytes: ByteArray = byteArrayOf()
-    this.catch{ KLogger.logger.error { it.message } }.collect {
+    this.catch { KLogger.logger.error { it.message } }.collect {
         bytes += it
     }
     val exportFile = File(dstPath)
@@ -79,15 +79,25 @@ suspend fun Flow<ByteArray>.exportFile(
 }
 
 fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.IO): ManagedChannel {
-    return if (address is TcpAddress) {
-        ManagedChannelBuilder.forAddress(address.host, address.port).usePlaintext()
-            .executor(dispatcher.asExecutor()).build()
-    } else {
-        address as DomainSocketAddress
-        ManagedChannelBuilder.forTarget(address.path).usePlaintext()
-            .executor(dispatcher.asExecutor())
-            .build()
+    val managedChannelBuilder = when (address) {
+        is TcpAddress -> ManagedChannelBuilder.forAddress(address.host, address.port)
+        is DomainSocketAddress -> ManagedChannelBuilder.forTarget(address.path)
     }
+    return managedChannelBuilder
+        .usePlaintext()
+        .executor(
+            dispatcher.asExecutor()
+        )
+        .build()
 }
 
 fun isStartedOnMac() = System.getProperty("os.name").contains("mac", ignoreCase = true)
+
+fun String.beautifyJsonString() = JsonUtil.convertStringToJsonNode(
+    "[${
+        this.replace(
+            "}\n" +
+                    "{", "},{"
+        )
+    }]"
+)

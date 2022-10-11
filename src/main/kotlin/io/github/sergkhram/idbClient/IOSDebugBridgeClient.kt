@@ -54,17 +54,7 @@ class IOSDebugBridgeClient(
                 proc = cmdBuilder(localTargetsListCmd).start()
                 proc.waitFor()
                 val output = proc.inputStream.bufferedReader().readText()
-
-                val outputAsJsonNode = JsonUtil.convertStringToJsonNode(
-                    "[${
-                        output.replace(
-                            "}\n" +
-                                    "{", "},{"
-                        )
-                    }]"
-                )
-
-                val localTargets = (outputAsJsonNode as ArrayNode?)
+                val localTargets = (output.beautifyJsonString() as ArrayNode?)
                     ?.map {
                         it.convertToTargetDescription()
                     }
