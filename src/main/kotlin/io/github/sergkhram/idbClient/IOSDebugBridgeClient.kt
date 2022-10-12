@@ -27,6 +27,11 @@ import kotlinx.coroutines.flow.onCompletion
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * @param dispatcher - Kotlin dispatcher, will be used for grpc channels
+ * @param listOfCompanions - addresses, will be used to connect to at the start of client
+ * @param withLocal - additionally use local targets in case of starting on mac
+ */
 class IOSDebugBridgeClient(
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val listOfCompanions: List<Address> = emptyList(),

@@ -22,3 +22,10 @@
 )
 result.forEach(::println)
 </code></pre></div></div>
+<h3 style="color:#444;">Disconnect companion</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>idb.disconnectCompanion(host, port)
+//or idb.disconnectCompanion(udid)
+</code></pre></div></div>
+<h3 style="color:#444;">Get current targets(connected)</h3>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>val response = idb.getTargetsList()
+</code></pre></div></div>
