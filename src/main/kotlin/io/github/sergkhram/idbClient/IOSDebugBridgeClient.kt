@@ -1,11 +1,12 @@
 package io.github.sergkhram.idbClient
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
-import io.github.sergkhram.idbClient.Const.localTargetsListCmd
 import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
 import io.github.sergkhram.idbClient.entities.*
+import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.address.Address
 import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
@@ -18,14 +19,12 @@ import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
 import io.github.sergkhram.idbClient.util.*
-import io.github.sergkhram.idbClient.util.cmdBuilder
 import io.github.sergkhram.idbClient.util.convertToTargetDescription
 import io.grpc.StatusException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onCompletion
 import java.io.File
-import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 
 class IOSDebugBridgeClient(
@@ -41,30 +40,28 @@ class IOSDebugBridgeClient(
 
     init {
         runBlocking {
+            val connectJobs = mutableListOf<Deferred<*>>()
             listOfCompanions.forEach { address ->
-                connectToCompanion(address)
+                connectJobs.add(
+                    async {
+                        connectToCompanion(address)
+                    }
+                )
             }
+            connectJobs.awaitAll()
         }
         if (withLocal
             && isStartedOnMac()
             && File(localIdbCompanionPath).exists()
         ) {
-            var proc: Process? = null
-            try {
-                proc = cmdBuilder(localTargetsListCmd).start()
-                proc.waitFor()
-                val output = proc.inputStream.bufferedReader().readText()
-                val localTargets = (output.beautifyJsonString() as ArrayNode?)
-                    ?.map {
-                        it.convertToTargetDescription()
+            val localTargetsJson = getLocalTargetsJson()
+            localTargetsJson?.let { json ->
+                (json as ArrayNode)
+                    .map(
+                        JsonNode::convertToTargetDescription
+                    ).forEach { target ->
+                        clients[target.udid] = LocalCompanionData(target.udid)
                     }
-                localTargets?.forEach { target ->
-                    clients[target.udid] = LocalCompanionData(target.udid)
-                }
-            } catch (e: IOException) {
-                log.info(e.localizedMessage, e)
-            } finally {
-                proc?.takeIf { proc.isAlive }?.destroy()
             }
         }
     }

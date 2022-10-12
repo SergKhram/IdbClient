@@ -3,13 +3,13 @@ package io.github.sergkhram.idbClient.entities
 import idb.CompanionServiceGrpcKt
 import io.github.sergkhram.idbClient.Const.localGrpcStartTimeout
 import io.github.sergkhram.idbClient.Const.localHost
-import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
+import io.github.sergkhram.idbClient.entities.ProcessManager.available
+import io.github.sergkhram.idbClient.entities.ProcessManager.startLocalCompanion
 import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
 import io.github.sergkhram.idbClient.logs.KLogger
-import io.github.sergkhram.idbClient.util.cmdBuilder
 import io.github.sergkhram.idbClient.util.prepareManagedChannel
 import io.grpc.ManagedChannel
 import io.grpc.Status
@@ -32,19 +32,13 @@ internal class GrpcClient(
     val stub: CompanionServiceGrpcKt.CompanionServiceCoroutineStub by lazy {
         if(companionData.isLocal) {
             companionData as LocalCompanionData
-            val port = PortRegistry.getFreePort()
-            val processBuilder = cmdBuilder(
-                startLocalCompanionCmd(
-                    companionData.udid,
-                    port
-                )
-            )
-            process = processBuilder.start()
+            val startResult = startLocalCompanion(companionData)
+            process = startResult.first
             runBlocking {
-                waitUntilLocalCompanionStarted(port, companionData.udid)
+                waitUntilLocalCompanionStarted(startResult.second, companionData.udid)
             }
             channel = prepareManagedChannel(
-                TcpAddress(localHost, port),
+                TcpAddress(localHost, startResult.second),
                 dispatcher
             )
         } else {
@@ -65,7 +59,7 @@ internal class GrpcClient(
     private suspend fun waitUntilLocalCompanionStarted(port: Int, udid: String) {
         try {
             withTimeout(localGrpcStartTimeout) {
-                while (PortRegistry.available(port)) {
+                while (available(port)) {
                     delay(100)
                 }
             }
