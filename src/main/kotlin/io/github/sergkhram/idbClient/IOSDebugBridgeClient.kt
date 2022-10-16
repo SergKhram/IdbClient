@@ -32,7 +32,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @param withLocal - additionally use local targets in case of starting on mac
  */
 class IOSDebugBridgeClient(
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val listOfCompanions: List<Address> = emptyList(),
     withLocal: Boolean = false
 ) {
@@ -124,9 +124,9 @@ class IOSDebugBridgeClient(
     suspend fun connectToCompanion(address: Address, dispatcher: CoroutineDispatcher = this.dispatcher): String? {
         log.debug("Connecting $address companion started")
         var udid: String? = null
-        val remoteCompanionData = RemoteCompanionData(address)
+        val remoteCompanionData = RemoteCompanionData(address, dispatcher)
         try {
-            val grpcClient = GrpcClient(remoteCompanionData, dispatcher)
+            val grpcClient = GrpcClient(remoteCompanionData)
             val connectionResponse = grpcClient.use {
                 it.stub.connect(
                     ConnectRequest.getDefaultInstance()

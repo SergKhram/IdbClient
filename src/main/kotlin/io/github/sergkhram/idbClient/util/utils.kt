@@ -78,7 +78,7 @@ suspend fun Flow<ByteArray>.exportFile(
     return exportFile
 }
 
-internal fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.IO): ManagedChannel {
+internal fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.Default): ManagedChannel {
     val managedChannelBuilder = when (address) {
         is TcpAddress -> ManagedChannelBuilder.forAddress(address.host, address.port)
         is DomainSocketAddress -> ManagedChannelBuilder.forTarget(address.path)

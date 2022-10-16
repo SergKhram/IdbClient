@@ -21,7 +21,7 @@ import javax.annotation.PreDestroy
 
 internal class GrpcClient(
     private val companionData: CompanionData,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ): Closeable {
     companion object {
         private val log = KLogger.logger
