@@ -32,7 +32,7 @@ internal class GrpcClient(
     val stub: CompanionServiceGrpcKt.CompanionServiceCoroutineStub by lazy {
         if(companionData.isLocal) {
             companionData as LocalCompanionData
-            val startResult = startLocalCompanion(companionData)
+            val startResult = startLocalCompanion(companionData.udid)
             process = startResult.first
             runBlocking {
                 waitUntilLocalCompanionStarted(startResult.second, companionData.udid)

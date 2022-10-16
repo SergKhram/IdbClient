@@ -3,7 +3,6 @@ package io.github.sergkhram.idbClient.entities
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.sergkhram.idbClient.Const.localTargetsListCmd
 import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
-import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.util.beautifyJsonString
 import io.github.sergkhram.idbClient.util.cmdBuilder
@@ -15,11 +14,11 @@ internal object ProcessManager {
     private val log = KLogger.logger
 
     @Synchronized
-    fun startLocalCompanion(companionData: LocalCompanionData):Pair<Process,Int> {
+    fun startLocalCompanion(udid: String):Pair<Process,Int> {
         val port = getFreePort()
         val processBuilder = cmdBuilder(
             startLocalCompanionCmd(
-                companionData.udid,
+                udid,
                 port
             )
         )
