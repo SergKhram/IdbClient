@@ -78,7 +78,7 @@ suspend fun Flow<ByteArray>.exportFile(
     return exportFile
 }
 
-fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.IO): ManagedChannel {
+internal fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.IO): ManagedChannel {
     val managedChannelBuilder = when (address) {
         is TcpAddress -> ManagedChannelBuilder.forAddress(address.host, address.port)
         is DomainSocketAddress -> ManagedChannelBuilder.forTarget(address.path)
@@ -91,9 +91,9 @@ fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Di
         .build()
 }
 
-fun isStartedOnMac() = System.getProperty("os.name").contains("mac", ignoreCase = true)
+internal fun isStartedOnMac() = System.getProperty("os.name").contains("mac", ignoreCase = true)
 
-fun String.beautifyJsonString() = JsonUtil.convertStringToJsonNode(
+internal fun String.beautifyJsonString() = JsonUtil.convertStringToJsonNode(
     "[${
         this.replace(
             "}\n" +

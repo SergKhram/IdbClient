@@ -5,10 +5,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
 import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
-import io.github.sergkhram.idbClient.entities.*
+import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.address.Address
-import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
@@ -18,8 +17,8 @@ import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
-import io.github.sergkhram.idbClient.util.*
 import io.github.sergkhram.idbClient.util.convertToTargetDescription
+import io.github.sergkhram.idbClient.util.isStartedOnMac
 import io.grpc.StatusException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -143,29 +142,29 @@ class IOSDebugBridgeClient(
     }
 
     fun disconnectCompanion(udid: String) {
-        clients.takeIf { it.containsKey(udid) }?.let {
+        clients.entries.firstOrNull { it.key == udid }?.let {
             log.debug("Disconnecting $udid companion started")
-            it.remove(udid)
+            it.value.takeIf { client -> !client.isLocal }?.let { remote ->
+                (remote as RemoteCompanionData).shutdownChannel()
+            }
+            clients.remove(udid)
             log.debug("Disconnecting $udid companion finished")
         }
     }
 
-    fun disconnectCompanion(host: String?, port: Int?) {
+    fun disconnectCompanion(address: Address) {
         clients.entries.firstOrNull {
-            it.value.takeIf { value -> !value.isLocal }?.let { companionData ->
-                companionData as RemoteCompanionData
-                companionData.address is TcpAddress
-                    && companionData.address.host == host
-                    && companionData.address.port == port
-            } ?: false
+            !it.value.isLocal && (it.value as RemoteCompanionData).address == address
         }?.let { entry ->
-            log.debug("Disconnecting $host:$port companion started")
+            log.debug("Disconnecting $address companion started")
+            (entry.value as RemoteCompanionData).shutdownChannel()
             clients.remove(entry.key)
-            log.debug("Disconnecting $host:$port companion finished")
+            log.debug("Disconnecting $address companion finished")
         }
     }
 
-    private suspend fun <K, V, B> ConcurrentHashMap<K, V>.pMap(f: suspend (Map.Entry<K, V>) -> B?): List<B?> = coroutineScope {
-        map { async { f(it) } }.awaitAll()
-    }
+    private suspend fun <K, V, B> ConcurrentHashMap<K, V>.pMap(f: suspend (Map.Entry<K, V>) -> B?): List<B?> =
+        coroutineScope {
+            map { async { f(it) } }.awaitAll()
+        }
 }

@@ -43,17 +43,19 @@ internal class GrpcClient(
             )
         } else {
             companionData as RemoteCompanionData
-            channel = prepareManagedChannel(companionData.address, dispatcher)
+            channel = companionData.channel
         }
         CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel)
     }
 
     @PreDestroy
     override fun close() {
-        log.debug("Started gRPC client ${this.hashCode()} shutdown")
-        if(companionData.isLocal) process?.takeIf { it.isAlive }?.destroy()
-        if(this::channel.isInitialized) channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
-        log.debug("Completed gRPC client ${this.hashCode()} shutdown")
+        log.debug("gRPC client ${this.hashCode()} shutdown started")
+        if(companionData.isLocal) {
+            if(this::channel.isInitialized) channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+            process?.takeIf { it.isAlive }?.destroy()
+        }
+        log.debug("gRPC client ${this.hashCode()} shutdown completed")
     }
 
     private suspend fun waitUntilLocalCompanionStarted(port: Int, udid: String) {
