@@ -15,7 +15,7 @@ sealed class HidRequestBody {
      * Input text
      * @param text - Text to input
      */
-    data class TextCmdHidRequestBody(val text: String) : HidRequestBody() {
+    class TextCmdHidRequestBody(text: String) : HidRequestBody() {
         override val requestBody = text.flatMap {
             mapOfCodes[it] ?: emptyList()
         }.asFlow()
@@ -27,20 +27,26 @@ sealed class HidRequestBody {
      * @param y - The y-coordinate
      * @param duration - Press duration
      */
-    data class TapCmdRequestBody(val x: Double, val y: Double, val duration: Double = 0.0) : HidRequestBody() {
+    class TapCmdRequestBody(x: Double, y: Double, duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareListOfTapEvents(x, y, duration).asFlow()
 
         private fun prepareListOfTapEvents(x: Double, y: Double, duration: Double): List<HIDEvent> {
             val list = mutableListOf<HIDEvent>()
             val action = HIDPressAction.newBuilder()
                 .setTouch(
-                    HIDEvent.HIDTouch.newBuilder().setPoint(Point.newBuilder().setY(y).setX(x)).build()
+                    HIDEvent.HIDTouch.newBuilder()
+                        .setPoint(
+                            Point.newBuilder().setY(y).setX(x)
+                        ).build()
                 )
                 .build()
             list.add(
                 HIDEvent.newBuilder()
                 .setPress(
-                    HIDPress.newBuilder().setAction(action).setDirection(HIDEvent.HIDDirection.DOWN).build()
+                    HIDPress.newBuilder()
+                        .setAction(action)
+                        .setDirection(HIDEvent.HIDDirection.DOWN)
+                        .build()
                 )
                 .build()
             )
@@ -52,7 +58,10 @@ sealed class HidRequestBody {
             list.add(
                 HIDEvent.newBuilder()
                 .setPress(
-                    HIDPress.newBuilder().setAction(action).setDirection(HIDEvent.HIDDirection.UP).build()
+                    HIDPress.newBuilder()
+                        .setAction(action)
+                        .setDirection(HIDEvent.HIDDirection.UP)
+                        .build()
                 )
                 .build()
             )
@@ -65,20 +74,25 @@ sealed class HidRequestBody {
      * @param button - The button name
      * @param duration - Press duration
      */
-    data class ButtonPressCmdRequestBody(val button: AppleButton, val duration: Double = 0.0) : HidRequestBody() {
+    class ButtonPressCmdRequestBody(button: AppleButton, duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareListOfButtonClickEvents(button, duration).asFlow()
 
         private fun prepareListOfButtonClickEvents(button: AppleButton, duration: Double): List<HIDEvent> {
             val list = mutableListOf<HIDEvent>()
             val action = HIDPressAction.newBuilder()
                 .setButton(
-                    HIDEvent.HIDButton.newBuilder().setButtonValue(button.value).build()
+                    HIDEvent.HIDButton.newBuilder()
+                        .setButtonValue(button.value)
+                        .build()
                 )
                 .build()
             list.add(
                 HIDEvent.newBuilder()
                     .setPress(
-                        HIDPress.newBuilder().setAction(action).setDirection(HIDEvent.HIDDirection.DOWN).build()
+                        HIDPress.newBuilder()
+                            .setAction(action)
+                            .setDirection(HIDEvent.HIDDirection.DOWN)
+                            .build()
                     )
                     .build()
             )
@@ -90,7 +104,10 @@ sealed class HidRequestBody {
             list.add(
                 HIDEvent.newBuilder()
                     .setPress(
-                        HIDPress.newBuilder().setAction(action).setDirection(HIDEvent.HIDDirection.UP).build()
+                        HIDPress.newBuilder()
+                            .setAction(action)
+                            .setDirection(HIDEvent.HIDDirection.UP)
+                            .build()
                     )
                     .build()
             )
@@ -103,7 +120,7 @@ sealed class HidRequestBody {
      * @param code - The key code
      * @param duration - Press duration
      */
-    data class KeyPressCmdRequestBody(val code: Int, val duration: Double = 0.0) : HidRequestBody() {
+    class KeyPressCmdRequestBody(code: Int, duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareKeyCodeEvents(code, duration).asFlow()
     }
 
@@ -111,7 +128,7 @@ sealed class HidRequestBody {
      * A sequence of short presses of a keycode
      * @param keys - list of key codes
      */
-    data class KeysPressCmdRequestBody(val keys: List<Int>) : HidRequestBody() {
+    class KeysPressCmdRequestBody(keys: List<Int>) : HidRequestBody() {
         override val requestBody = keys.flatMap { prepareKeyCodeEvents(it) }.asFlow()
     }
 
@@ -124,13 +141,13 @@ sealed class HidRequestBody {
      * @param deltaValue - delta in pixels between every touch point on the line between start and end points
      * @param durationValue - Swipe duration
      */
-    data class SwipeCmdRequestBody(
-        val startX: Double,
-        val startY: Double,
-        val endX: Double,
-        val endY: Double,
-        val deltaValue: Double = 0.0,
-        val durationValue: Double = 0.0
+    class SwipeCmdRequestBody(
+        startX: Double,
+        startY: Double,
+        endX: Double,
+        endY: Double,
+        deltaValue: Double = 0.0,
+        durationValue: Double = 0.0
     ) : HidRequestBody() {
         override val requestBody: Flow<HIDEvent> = listOf(
             HIDEvent.newBuilder()

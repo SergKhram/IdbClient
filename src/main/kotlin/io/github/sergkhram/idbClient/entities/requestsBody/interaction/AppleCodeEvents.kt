@@ -133,6 +133,7 @@ object AppleCodeEvents {
         )
         return list
     }
+
     private fun prepareShiftKeyEvent(i: Int) : List<HIDEvent> {
         val list = mutableListOf<HIDEvent>()
         val action = HIDEvent.HIDPressAction.newBuilder()

@@ -9,9 +9,13 @@ sealed class DebugServerRequestBody {
      * Start the Debug Server
      * @param bundleId - The bundle id to debug
      */
-    data class DebugServerStartRequest(val bundleId: String) : DebugServerRequestBody() {
+    class DebugServerStartRequest(bundleId: String) : DebugServerRequestBody() {
         override val requestBody: DebugServerRequest = DebugServerRequest.newBuilder()
-            .setStart(DebugServerRequest.Start.newBuilder().setBundleId(bundleId).build()).build()
+            .setStart(
+                DebugServerRequest.Start.newBuilder()
+                    .setBundleId(bundleId)
+                    .build()
+            ).build()
     }
 
     /**
@@ -19,7 +23,9 @@ sealed class DebugServerRequestBody {
      */
     class DebugServerStopRequest : DebugServerRequestBody() {
         override val requestBody: DebugServerRequest = DebugServerRequest.newBuilder()
-            .setStop(DebugServerRequest.Stop.getDefaultInstance()).build()
+            .setStop(
+                DebugServerRequest.Stop.getDefaultInstance()
+            ).build()
     }
 
     /**
@@ -27,6 +33,8 @@ sealed class DebugServerRequestBody {
      */
     class DebugServerStatusRequest : DebugServerRequestBody() {
         override val requestBody: DebugServerRequest = DebugServerRequest.newBuilder()
-            .setStatus(DebugServerRequest.Status.getDefaultInstance()).build()
+            .setStatus(
+                DebugServerRequest.Status.getDefaultInstance()
+            ).build()
     }
 }
