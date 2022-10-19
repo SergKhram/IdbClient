@@ -5,7 +5,7 @@
     <groupId>io.github.sergkhram</groupId>
     <artifactId>idbclient</artifactId>
     <name>IdbClient</name>
-    <version>0.0.3-RELEASE</version>
+    <version>0.0.4-RELEASE</version>
     <packaging>jar</packaging>
     <description>IdbClient is kotlin-like client, created to connect and control Apple devices and simulators</description>
     <url>https://github.com/SergKhram/IdbClient</url>
@@ -109,7 +109,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-            <version>2.13.3</version>
+            <version>2.14.0-rc1</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

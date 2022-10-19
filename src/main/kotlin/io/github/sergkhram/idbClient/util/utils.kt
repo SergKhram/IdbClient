@@ -32,7 +32,11 @@ internal fun JsonNode.convertToTargetDescription() = TargetDescription.newBuilde
 
 internal val cmdBuilder: (List<String>) -> ProcessBuilder = {
     ProcessBuilder(it)
-        .directory(File(System.getProperty("user.home")))
+        .directory(
+            File(
+                System.getProperty("user.home")
+            )
+        )
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectError(ProcessBuilder.Redirect.PIPE)
 }
@@ -41,9 +45,15 @@ internal fun compress(srcPath: String): Path {
     val zipPath = kotlin.io.path.createTempFile(suffix = ".zip")
     val srcFile = File(srcPath)
     if (srcFile.isDirectory)
-        ZipUtil.pack(srcFile, zipPath.toFile())
+        ZipUtil.pack(
+            srcFile,
+            zipPath.toFile()
+        )
     else
-        ZipUtil.packEntry(srcFile, zipPath.toFile())
+        ZipUtil.packEntry(
+            srcFile,
+            zipPath.toFile()
+        )
     return zipPath
 }
 
@@ -78,7 +88,10 @@ suspend fun Flow<ByteArray>.exportFile(
     return exportFile
 }
 
-internal fun prepareManagedChannel(address: Address, dispatcher: CoroutineDispatcher = Dispatchers.Default): ManagedChannel {
+internal fun prepareManagedChannel(
+    address: Address,
+    dispatcher: CoroutineDispatcher = Dispatchers.Default
+): ManagedChannel {
     val managedChannelBuilder = when (address) {
         is TcpAddress -> ManagedChannelBuilder.forAddress(address.host, address.port)
         is DomainSocketAddress -> ManagedChannelBuilder.forTarget(address.path)

@@ -14,7 +14,7 @@ internal object ProcessManager {
     private val log = KLogger.logger
 
     @Synchronized
-    fun startLocalCompanion(udid: String):Pair<Process,Int> {
+    fun startLocalCompanion(udid: String): Pair<Process, Int> {
         val port = getFreePort()
         val processBuilder = cmdBuilder(
             startLocalCompanionCmd(

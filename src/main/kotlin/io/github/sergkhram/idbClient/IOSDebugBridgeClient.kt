@@ -1,6 +1,5 @@
 package io.github.sergkhram.idbClient
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
@@ -17,7 +16,6 @@ import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
-import io.github.sergkhram.idbClient.util.convertToTargetDescription
 import io.github.sergkhram.idbClient.util.isStartedOnMac
 import io.grpc.StatusException
 import kotlinx.coroutines.*
@@ -44,15 +42,15 @@ class IOSDebugBridgeClient(
 
     init {
         runBlocking {
-            val connectJobs = mutableListOf<Deferred<*>>()
+            val connectJobs = mutableListOf<Job>()
             listOfCompanions.forEach { address ->
                 connectJobs.add(
-                    async {
+                    launch {
                         connectToCompanion(address)
                     }
                 )
             }
-            connectJobs.awaitAll()
+            connectJobs.joinAll()
         }
         if (withLocal
             && isStartedOnMac()
@@ -61,10 +59,10 @@ class IOSDebugBridgeClient(
             val localTargetsJson = getLocalTargetsJson()
             localTargetsJson?.let { json ->
                 (json as ArrayNode)
-                    .map(
-                        JsonNode::convertToTargetDescription
-                    ).forEach { target ->
-                        clients[target.udid] = LocalCompanionData(target.udid)
+                    .mapNotNull {
+                        it.get("udid")?.asText()
+                    }.forEach {
+                        clients[it] = LocalCompanionData(it)
                     }
             }
         }
