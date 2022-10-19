@@ -10,48 +10,34 @@ import kotlin.io.path.deleteIfExists
 sealed class PayloadRequestBody {
     abstract val requestBody: Payload
 
-    data class UpdateContactsPayload(val contactsDbFile: File): PayloadRequestBody() {
-        override val requestBody: Payload = Payload.newBuilder().setData(
-            ByteString.copyFrom(
-                FileUtils.readFileToByteArray(contactsDbFile)
-            )
-        ).build()
+    class UpdateContactsPayload(contactsDbFile: File): PayloadRequestBody() {
+        override val requestBody: Payload = buildPayloadObject(contactsDbFile)
     }
 
     class DataPayload(file: File): PayloadRequestBody() {
-        override val requestBody: Payload = Payload.newBuilder()
-            .setData(
-                ByteString.copyFrom(
-                    FileUtils.readFileToByteArray(file)
-                )
-            )
-            .build()
+        override val requestBody: Payload = buildPayloadObject(file)
     }
 
     class IpaPayload(file: File): PayloadRequestBody() {
-        override val requestBody: Payload = Payload.newBuilder()
-            .setData(
-                ByteString.copyFrom(
-                    FileUtils.readFileToByteArray(file)
-                )
-            )
-            .build()
+        override val requestBody: Payload = buildPayloadObject(file)
     }
 
     class AppPayload(file: File): PayloadRequestBody() {
-        override val requestBody: Payload = preparePayload(file)
+        override val requestBody: Payload = prepareAppPayload(file)
 
-        private fun preparePayload(file: File): Payload {
+        private fun prepareAppPayload(file: File): Payload {
             val zipPath = compress(file.path)
-            val payload = Payload.newBuilder()
-                .setData(
-                    ByteString.copyFrom(
-                        FileUtils.readFileToByteArray(zipPath.toFile())
-                    )
-                )
-                .build()
+            val payload = buildPayloadObject(zipPath.toFile())
             zipPath.deleteIfExists()
             return payload
         }
     }
+
+    protected fun buildPayloadObject(file: File): Payload = Payload.newBuilder()
+        .setData(
+            ByteString.copyFrom(
+                FileUtils.readFileToByteArray(file)
+            )
+        )
+        .build()
 }

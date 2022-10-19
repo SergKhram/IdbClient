@@ -1,7 +1,5 @@
 package io.github.sergkhram.idbClient.util
 
-import com.fasterxml.jackson.databind.JsonNode
-import idb.TargetDescription
 import io.github.sergkhram.idbClient.entities.address.Address
 import io.github.sergkhram.idbClient.entities.address.DomainSocketAddress
 import io.github.sergkhram.idbClient.entities.address.TcpAddress
@@ -20,15 +18,6 @@ import java.io.FileInputStream
 import java.nio.file.Path
 import java.util.zip.GZIPInputStream
 import kotlin.io.path.deleteIfExists
-
-internal fun JsonNode.convertToTargetDescription() = TargetDescription.newBuilder()
-    .setUdid(this.get("udid").asText())
-    .setName(this.get("name").asText())
-    .setState(this.get("state").asText())
-    .setTargetType(this.get("type").asText())
-    .setOsVersion(this.get("os_version").asText())
-    .setArchitecture(this.get("architecture").asText())
-    .build()
 
 internal val cmdBuilder: (List<String>) -> ProcessBuilder = {
     ProcessBuilder(it)

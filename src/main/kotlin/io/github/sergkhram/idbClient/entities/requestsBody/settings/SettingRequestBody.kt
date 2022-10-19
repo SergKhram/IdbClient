@@ -12,18 +12,27 @@ sealed class SettingRequestBody {
     /**
      * @param enabled - activate/deactivate HardwareKeyboard setting
      */
-    data class HardwareKeyboardSetting(val enabled: Boolean) : SettingRequestBody() {
+    class HardwareKeyboardSetting(enabled: Boolean) : SettingRequestBody() {
         override val requestBody: SettingRequest = SettingRequest.newBuilder()
-            .setHardwareKeyboard(SettingRequest.HardwareKeyboard.newBuilder().setEnabled(enabled).build()).build()
+            .setHardwareKeyboard(
+                SettingRequest.HardwareKeyboard.newBuilder()
+                    .setEnabled(enabled)
+                    .build()
+            )
+            .build()
     }
 
     /**
      * @param localeIdentifier - Preference value
      */
-    data class LocaleSetting(val localeIdentifier: String) : SettingRequestBody() {
-        override val requestBody: SettingRequest = SettingRequest.newBuilder().setStringSetting(
-            SettingRequest.StringSetting.newBuilder().setSetting(Setting.LOCALE).setValue(localeIdentifier).build()
-        ).build()
+    class LocaleSetting(localeIdentifier: String) : SettingRequestBody() {
+        override val requestBody: SettingRequest = SettingRequest.newBuilder()
+            .setStringSetting(
+                SettingRequest.StringSetting.newBuilder()
+                    .setSetting(Setting.LOCALE)
+                    .setValue(localeIdentifier)
+                    .build()
+            ).build()
     }
 
     /**
@@ -33,16 +42,17 @@ sealed class SettingRequestBody {
      * Example of usage: idb set --domain com.apple.suggestions.plist SuggestionsAppLibraryEnabled --type bool true
      * @param domain - Preference domain, assumed to be Apple Global Domain if not specified
      */
-    data class AnySetting(val name: String, val value: String, val valueType: String, val domain: String = "") :
+    class AnySetting(name: String, value: String, valueType: String, domain: String = "") :
         SettingRequestBody() {
-        override val requestBody: SettingRequest = SettingRequest.newBuilder().setStringSetting(
-            SettingRequest.StringSetting.newBuilder()
-                .setSetting(Setting.ANY)
-                .setName(name)
-                .setValue(value)
-                .setValueType(valueType)
-                .setDomain(domain)
-                .build()
-        ).build()
+        override val requestBody: SettingRequest = SettingRequest.newBuilder()
+            .setStringSetting(
+                SettingRequest.StringSetting.newBuilder()
+                    .setSetting(Setting.ANY)
+                    .setName(name)
+                    .setValue(value)
+                    .setValueType(valueType)
+                    .setDomain(domain)
+                    .build()
+            ).build()
     }
 }

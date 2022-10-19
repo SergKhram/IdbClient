@@ -10,9 +10,9 @@ sealed class LsRequestBody {
      * @param paths - List of source paths
      * @param container - File container(Default is ROOT)
      */
-    data class MultipleLsRequestBody(
-        val paths: List<String>,
-        val container: FileContainer = FileContainer()
+    class MultipleLsRequestBody(
+        paths: List<String>,
+        container: FileContainer = FileContainer()
     ) : LsRequestBody(){
         override val requestBody: LsRequest = LsRequest.newBuilder().setContainer(
             container.toFileContainerProto()
@@ -24,9 +24,9 @@ sealed class LsRequestBody {
      * @param path - Source path
      * @param container - File container(Default is ROOT)
      */
-    data class SingleLsRequestBody(
-        val path: String,
-        val container: FileContainer = FileContainer()
+    class SingleLsRequestBody(
+        path: String,
+        container: FileContainer = FileContainer()
     ) : LsRequestBody(){
         override val requestBody: LsRequest = LsRequest.newBuilder().setContainer(
             container.toFileContainerProto()

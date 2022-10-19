@@ -14,13 +14,13 @@ sealed class LaunchRequestBody {
      * @param waitFor - Wait for the process to exit, tailing all output from the app
      * @param waitForDebugger - Suspend application right after the launch to facilitate attaching of a debugger (ex, lldb).
      */
-    data class StartLaunchRequestBody(
-        val bundleId: String,
-        val env: Map<String, String> = emptyMap(),
-        val appArgs: List<String> = emptyList(),
-        val foregroundIfRunning: Boolean = false,
-        val waitFor: Boolean = false,
-        val waitForDebugger: Boolean = false
+    class StartLaunchRequestBody(
+        bundleId: String,
+        env: Map<String, String> = emptyMap(),
+        appArgs: List<String> = emptyList(),
+        foregroundIfRunning: Boolean = false,
+        waitFor: Boolean = false,
+        waitForDebugger: Boolean = false
     ): LaunchRequestBody(){
         override val requestBody: LaunchRequest = LaunchRequest.newBuilder()
             .setStart(

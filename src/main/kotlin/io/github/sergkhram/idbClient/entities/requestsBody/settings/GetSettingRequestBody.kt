@@ -10,7 +10,9 @@ sealed class GetSettingRequestBody {
      * Gets a local preference value
      */
     class LocaleSetting : GetSettingRequestBody() {
-        override val requestBody: GetSettingRequest = GetSettingRequest.newBuilder().setSetting(Setting.LOCALE).build()
+        override val requestBody: GetSettingRequest = GetSettingRequest.newBuilder()
+            .setSetting(Setting.LOCALE)
+            .build()
     }
 
     /**
@@ -18,8 +20,7 @@ sealed class GetSettingRequestBody {
      * @param name - Preference name
      * @param domain - Preference domain, assumed to be Apple Global Domain if not specified
      */
-    data class AnySetting(val name: String, val domain: String = "") :
-        GetSettingRequestBody() {
+    class AnySetting(name: String, domain: String = "") : GetSettingRequestBody() {
         override val requestBody: GetSettingRequest = GetSettingRequest.newBuilder()
             .setSetting(Setting.ANY)
             .setName(name)
