@@ -1,7 +1,7 @@
 package io.github.sergkhram.idbClient.requests.media
 
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.response.VideoResponse
+import io.github.sergkhram.idbClient.entities.response.FileResponse.VideoResponse
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.util.unpackBytes
 import kotlinx.coroutines.delay

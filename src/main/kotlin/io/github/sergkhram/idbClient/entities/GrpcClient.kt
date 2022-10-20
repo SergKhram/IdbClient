@@ -22,28 +22,30 @@ import javax.annotation.PreDestroy
 internal class GrpcClient(
     private val companionData: CompanionData,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-): Closeable {
+) : Closeable {
     companion object {
         private val log = KLogger.logger
     }
+
     private lateinit var channel: ManagedChannel
     private var process: Process? = null
 
     val stub: CompanionServiceGrpcKt.CompanionServiceCoroutineStub by lazy {
-        if(companionData.isLocal) {
-            companionData as LocalCompanionData
-            val startResult = startLocalCompanion(companionData.udid)
-            process = startResult.first
-            runBlocking {
-                waitUntilLocalCompanionStarted(startResult.second, companionData.udid)
+        when (companionData) {
+            is LocalCompanionData -> {
+                val startResult = startLocalCompanion(companionData.udid)
+                process = startResult.first
+                runBlocking {
+                    waitUntilLocalCompanionStarted(startResult.second, companionData.udid)
+                }
+                channel = prepareManagedChannel(
+                    TcpAddress(localHost, startResult.second),
+                    dispatcher
+                )
             }
-            channel = prepareManagedChannel(
-                TcpAddress(localHost, startResult.second),
-                dispatcher
-            )
-        } else {
-            companionData as RemoteCompanionData
-            channel = companionData.channel
+            is RemoteCompanionData -> {
+                channel = companionData.channel
+            }
         }
         CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel)
     }
@@ -51,8 +53,8 @@ internal class GrpcClient(
     @PreDestroy
     override fun close() {
         log.debug("gRPC client ${this.hashCode()} shutdown started")
-        if(companionData.isLocal) {
-            if(this::channel.isInitialized) channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
+        if (companionData.isLocal) {
+            if (this::channel.isInitialized) channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
             process?.takeIf { it.isAlive }?.destroy()
         }
         log.debug("gRPC client ${this.hashCode()} shutdown completed")

@@ -1,6 +1,6 @@
 package io.github.sergkhram.idbClient.requests.media
 
-import io.github.sergkhram.idbClient.entities.response.ScreenshotResponse
+import io.github.sergkhram.idbClient.entities.response.FileResponse.ScreenshotResponse
 import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.requests.IdbRequest
 
