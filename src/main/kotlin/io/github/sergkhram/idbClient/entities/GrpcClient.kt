@@ -44,7 +44,8 @@ internal class GrpcClient(
                 )
             }
             is RemoteCompanionData -> {
-                channel = companionData.channel
+                logChannelInfo(companionData)
+                channel = companionData.getChannel()
             }
         }
         CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel)
@@ -73,5 +74,11 @@ internal class GrpcClient(
                 Status.ABORTED.withDescription("Start local companion($udid) process failed")
             )
         }
+    }
+
+    private fun logChannelInfo(companionData: RemoteCompanionData) {
+        log.debug("${companionData.address} - isShutdown = ${companionData.getChannel().isShutdown}")
+        log.debug("${companionData.address} - isTerminated = ${companionData.getChannel().isTerminated}")
+        log.debug("${companionData.address} - state = ${companionData.getChannel().getState(true)}")
     }
 }
