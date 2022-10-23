@@ -11,6 +11,7 @@ import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
 import io.github.sergkhram.idbClient.entities.response.DescribeKtResponse
+import io.github.sergkhram.idbClient.handlers.GrpcErrorHandler.handle
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
@@ -73,18 +74,12 @@ class IOSDebugBridgeClient(
     suspend fun <T : Any?> execute(request: IdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion, dispatcher).use { grpcClient ->
-                try {
+                handle(
+                    { (companion as RemoteCompanionData).rebuildChannel() },
+                    { clients.containsKey(udid) && companion is RemoteCompanionData },
+                    ClosedChannelException::class
+                ) {
                     request.execute(grpcClient)
-                } catch (e: StatusException) {
-                    if(e.status.cause is ClosedChannelException
-                        && clients.containsKey(udid)
-                        && companion is RemoteCompanionData
-                    ) {
-                        companion.rebuildChannel()
-                        request.execute(grpcClient)
-                    } else {
-                        throw e
-                    }
                 }
             }
         } ?: throw noCompanionWithUdidException(udid)
@@ -94,24 +89,15 @@ class IOSDebugBridgeClient(
     suspend fun <T : Any?> execute(request: AsyncIdbRequest<Flow<T>>, udid: String): Flow<T> {
         return clients[udid]?.let { companion ->
             val grpcClient = GrpcClient(companion, dispatcher)
-            try {
-                return@let request.execute(grpcClient)
+            handle(
+                { (companion as RemoteCompanionData).rebuildChannel() },
+                { clients.containsKey(udid) && companion is RemoteCompanionData },
+                ClosedChannelException::class
+            ) {
+                request.execute(grpcClient)
                     .onCompletion {
                         grpcClient.close()
                     }
-            } catch (e: StatusException) {
-                if(e.status.cause is ClosedChannelException
-                    && clients.containsKey(udid)
-                    && companion is RemoteCompanionData
-                ) {
-                    companion.rebuildChannel()
-                    return@let request.execute(grpcClient)
-                        .onCompletion {
-                            grpcClient.close()
-                        }
-                } else {
-                    throw e
-                }
             }
         } ?: throw noCompanionWithUdidException(udid)
     }
@@ -120,18 +106,12 @@ class IOSDebugBridgeClient(
     suspend fun <T : Any?> execute(request: PredicateIdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion, dispatcher).use { grpcClient ->
-                try {
+                handle(
+                    { (companion as RemoteCompanionData).rebuildChannel() },
+                    { clients.containsKey(udid) && companion is RemoteCompanionData },
+                    ClosedChannelException::class
+                ) {
                     request.execute(grpcClient)
-                } catch (e: StatusException) {
-                    if(e.status.cause is ClosedChannelException
-                        && clients.containsKey(udid)
-                        && companion is RemoteCompanionData
-                    ) {
-                        companion.rebuildChannel()
-                        request.execute(grpcClient)
-                    } else {
-                        throw e
-                    }
                 }
             }
         } ?: throw noCompanionWithUdidException(udid)
