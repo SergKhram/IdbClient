@@ -3,7 +3,7 @@ package io.github.sergkhram.idbClient
 import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
-import io.github.sergkhram.idbClient.Const.noCompanionWithUdid
+import io.github.sergkhram.idbClient.Const.noCompanionWithUdidException
 import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.address.Address
@@ -22,6 +22,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onCompletion
 import java.io.File
+import java.nio.channels.ClosedChannelException
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -72,29 +73,68 @@ class IOSDebugBridgeClient(
     suspend fun <T : Any?> execute(request: IdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion, dispatcher).use { grpcClient ->
-                request.execute(grpcClient)
+                try {
+                    request.execute(grpcClient)
+                } catch (e: StatusException) {
+                    if(e.status.cause is ClosedChannelException
+                        && clients.containsKey(udid)
+                        && companion is RemoteCompanionData
+                    ) {
+                        companion.rebuildChannel()
+                        request.execute(grpcClient)
+                    } else {
+                        throw e
+                    }
+                }
             }
-        } ?: throw noCompanionWithUdid(udid)
+        } ?: throw noCompanionWithUdidException(udid)
     }
 
     @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: AsyncIdbRequest<Flow<T>>, udid: String): Flow<T> {
         return clients[udid]?.let { companion ->
             val grpcClient = GrpcClient(companion, dispatcher)
-            return@let request.execute(grpcClient)
-                .onCompletion {
-                    grpcClient.close()
+            try {
+                return@let request.execute(grpcClient)
+                    .onCompletion {
+                        grpcClient.close()
+                    }
+            } catch (e: StatusException) {
+                if(e.status.cause is ClosedChannelException
+                    && clients.containsKey(udid)
+                    && companion is RemoteCompanionData
+                ) {
+                    companion.rebuildChannel()
+                    return@let request.execute(grpcClient)
+                        .onCompletion {
+                            grpcClient.close()
+                        }
+                } else {
+                    throw e
                 }
-        } ?: throw noCompanionWithUdid(udid)
+            }
+        } ?: throw noCompanionWithUdidException(udid)
     }
 
     @Throws(NoSuchElementException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: PredicateIdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion, dispatcher).use { grpcClient ->
-                request.execute(grpcClient)
+                try {
+                    request.execute(grpcClient)
+                } catch (e: StatusException) {
+                    if(e.status.cause is ClosedChannelException
+                        && clients.containsKey(udid)
+                        && companion is RemoteCompanionData
+                    ) {
+                        companion.rebuildChannel()
+                        request.execute(grpcClient)
+                    } else {
+                        throw e
+                    }
+                }
             }
-        } ?: throw noCompanionWithUdid(udid)
+        } ?: throw noCompanionWithUdidException(udid)
     }
 
     suspend fun getTargetsList(): List<DescribeKtResponse> {
