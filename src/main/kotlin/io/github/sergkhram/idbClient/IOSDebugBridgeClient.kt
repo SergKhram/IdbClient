@@ -3,7 +3,6 @@ package io.github.sergkhram.idbClient
 import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
-import io.github.sergkhram.idbClient.Const.noCompanionWithUdidException
 import io.github.sergkhram.idbClient.entities.GrpcClient
 import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.address.Address
@@ -17,6 +16,7 @@ import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
+import io.github.sergkhram.idbClient.util.NoCompanionWithUdidException
 import io.github.sergkhram.idbClient.util.isStartedOnMac
 import io.grpc.StatusException
 import kotlinx.coroutines.*
@@ -70,7 +70,7 @@ class IOSDebugBridgeClient(
         }
     }
 
-    @Throws(NoSuchElementException::class, StatusException::class)
+    @Throws(NoCompanionWithUdidException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: IdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion, dispatcher).use { grpcClient ->
@@ -82,10 +82,10 @@ class IOSDebugBridgeClient(
                     request.execute(grpcClient)
                 }
             }
-        } ?: throw noCompanionWithUdidException(udid)
+        } ?: throw NoCompanionWithUdidException(udid)
     }
 
-    @Throws(NoSuchElementException::class, StatusException::class)
+    @Throws(NoCompanionWithUdidException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: AsyncIdbRequest<Flow<T>>, udid: String): Flow<T> {
         return clients[udid]?.let { companion ->
             val grpcClient = GrpcClient(companion, dispatcher)
@@ -99,10 +99,10 @@ class IOSDebugBridgeClient(
                         grpcClient.close()
                     }
             }
-        } ?: throw noCompanionWithUdidException(udid)
+        } ?: throw NoCompanionWithUdidException(udid)
     }
 
-    @Throws(NoSuchElementException::class, StatusException::class)
+    @Throws(NoCompanionWithUdidException::class, StatusException::class)
     suspend fun <T : Any?> execute(request: PredicateIdbRequest<T>, udid: String): T {
         return clients[udid]?.let { companion ->
             GrpcClient(companion, dispatcher).use { grpcClient ->
@@ -114,7 +114,7 @@ class IOSDebugBridgeClient(
                     request.execute(grpcClient)
                 }
             }
-        } ?: throw noCompanionWithUdidException(udid)
+        } ?: throw NoCompanionWithUdidException(udid)
     }
 
     suspend fun getTargetsList(): List<DescribeKtResponse> {
