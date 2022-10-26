@@ -7,7 +7,7 @@ sealed class AccessibilityInfoRequestBody {
 
     /**
      * Describes Accessibility Information for the entire screen
-     * @param format - Will report data in the newer nested format, rather than the flat one
+     * @param format Will report data in the newer nested format, rather than the flat one
      */
     class AccessibilityInfoAllRequestBody(format: Format = Format.NESTED): AccessibilityInfoRequestBody() {
         override val requestBody: AccessibilityInfoRequest = AccessibilityInfoRequest.newBuilder()
@@ -17,9 +17,9 @@ sealed class AccessibilityInfoRequestBody {
 
     /**
      * Describes Accessibility Information at a point on the screen
-     * @param format - Will report data in the newer nested format, rather than the flat one
-     * @param x - The x-coordinate
-     * @param y - The y-coordinate
+     * @param format Will report data in the newer nested format, rather than the flat one
+     * @param x The x-coordinate
+     * @param y The y-coordinate
      */
     class AccessibilityInfoPointRequestBody(format: Format = Format.NESTED, x: Double, y: Double): AccessibilityInfoRequestBody() {
         override val requestBody: AccessibilityInfoRequest = AccessibilityInfoRequest.newBuilder()

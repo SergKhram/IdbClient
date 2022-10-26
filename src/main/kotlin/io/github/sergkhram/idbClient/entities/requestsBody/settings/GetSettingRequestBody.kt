@@ -17,8 +17,8 @@ sealed class GetSettingRequestBody {
 
     /**
      * Gets a preference value by name
-     * @param name - Preference name
-     * @param domain - Preference domain, assumed to be Apple Global Domain if not specified
+     * @param name Preference name
+     * @param domain Preference domain, assumed to be Apple Global Domain if not specified
      */
     class AnySetting(name: String, domain: String = "") : GetSettingRequestBody() {
         override val requestBody: GetSettingRequest = GetSettingRequest.newBuilder()

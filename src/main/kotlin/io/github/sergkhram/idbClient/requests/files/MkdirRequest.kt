@@ -9,8 +9,8 @@ import io.github.sergkhram.idbClient.requests.IdbRequest
 
 /**
  * Make a directory inside an application's container
- * @param path - Path to directory to create
- * @param container - File container(Default is ROOT)
+ * @param path Path to directory to create
+ * @param container File container(Default is ROOT)
  */
 class MkdirRequest(
     private val path: String,

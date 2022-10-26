@@ -10,7 +10,7 @@ sealed class SettingRequestBody {
     abstract val requestBody: SettingRequest
 
     /**
-     * @param enabled - activate/deactivate HardwareKeyboard setting
+     * @param enabled activate/deactivate HardwareKeyboard setting
      */
     class HardwareKeyboardSetting(enabled: Boolean) : SettingRequestBody() {
         override val requestBody: SettingRequest = SettingRequest.newBuilder()
@@ -23,7 +23,7 @@ sealed class SettingRequestBody {
     }
 
     /**
-     * @param localeIdentifier - Preference value
+     * @param localeIdentifier Preference value
      */
     class LocaleSetting(localeIdentifier: String) : SettingRequestBody() {
         override val requestBody: SettingRequest = SettingRequest.newBuilder()
@@ -36,11 +36,11 @@ sealed class SettingRequestBody {
     }
 
     /**
-     * @param name - Preference name
-     * @param value - Preference value
-     * @param valueType - Specifies the type of the value to be set, for supported types see 'defaults get help' defaults to string.
+     * @param name Preference name
+     * @param value Preference value
+     * @param valueType Specifies the type of the value to be set, for supported types see 'defaults get help' defaults to string.
      * Example of usage: idb set --domain com.apple.suggestions.plist SuggestionsAppLibraryEnabled --type bool true
-     * @param domain - Preference domain, assumed to be Apple Global Domain if not specified
+     * @param domain Preference domain, assumed to be Apple Global Domain if not specified
      */
     class AnySetting(name: String, value: String, valueType: String, domain: String = "") :
         SettingRequestBody() {

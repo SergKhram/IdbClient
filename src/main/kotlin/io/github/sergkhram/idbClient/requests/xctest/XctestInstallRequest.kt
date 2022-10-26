@@ -13,7 +13,7 @@ import java.io.File
 
 /**
  * Install a xctest
- * @param testBundlePath - Bundle path of the test bundle
+ * @param testBundlePath Bundle path of the test bundle
  */
 class XctestInstallRequest(
     private val testBundlePath: String

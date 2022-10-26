@@ -12,8 +12,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Tails a remote file
- * @param path - Relative container source path
- * @param container - File container(Default is ROOT)
+ * @param path Relative container source path
+ * @param container File container(Default is ROOT)
  */
 class TailRequest(
     val path: String,

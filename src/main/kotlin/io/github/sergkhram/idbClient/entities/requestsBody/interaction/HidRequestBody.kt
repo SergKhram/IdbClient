@@ -13,7 +13,7 @@ sealed class HidRequestBody {
 
     /**
      * Input text
-     * @param text - Text to input
+     * @param text Text to input
      */
     class TextCmdHidRequestBody(text: String) : HidRequestBody() {
         override val requestBody = text.flatMap {
@@ -23,9 +23,9 @@ sealed class HidRequestBody {
 
     /**
      * Tap On the Screen
-     * @param x - The x-coordinate
-     * @param y - The y-coordinate
-     * @param duration - Press duration
+     * @param x The x-coordinate
+     * @param y The y-coordinate
+     * @param duration Press duration
      */
     class TapCmdRequestBody(x: Double, y: Double, duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareListOfTapEvents(x, y, duration).asFlow()
@@ -71,8 +71,8 @@ sealed class HidRequestBody {
 
     /**
      * A single press of a button
-     * @param button - The button name
-     * @param duration - Press duration
+     * @param button The button name
+     * @param duration Press duration
      */
     class ButtonPressCmdRequestBody(button: AppleButton, duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareListOfButtonClickEvents(button, duration).asFlow()
@@ -117,8 +117,8 @@ sealed class HidRequestBody {
 
     /**
      * A short press of a keycode
-     * @param code - The key code
-     * @param duration - Press duration
+     * @param code The key code
+     * @param duration Press duration
      */
     class KeyPressCmdRequestBody(code: Int, duration: Double = 0.0) : HidRequestBody() {
         override val requestBody = prepareKeyCodeEvents(code, duration).asFlow()
@@ -126,7 +126,7 @@ sealed class HidRequestBody {
 
     /**
      * A sequence of short presses of a keycode
-     * @param keys - list of key codes
+     * @param keys list of key codes
      */
     class KeysPressCmdRequestBody(keys: List<Int>) : HidRequestBody() {
         override val requestBody = keys.flatMap { prepareKeyCodeEvents(it) }.asFlow()
@@ -134,12 +134,12 @@ sealed class HidRequestBody {
 
     /**
      * Swipe from one point to another point
-     * @param startX - The x-coordinate of the swipe start point
-     * @param startY - The y-coordinate of the swipe start point
-     * @param endX - The x-coordinate of the swipe end point
-     * @param endY - The y-coordinate of the swipe end point
-     * @param deltaValue - delta in pixels between every touch point on the line between start and end points
-     * @param durationValue - Swipe duration
+     * @param startX The x-coordinate of the swipe start point
+     * @param startY The y-coordinate of the swipe start point
+     * @param endX The x-coordinate of the swipe end point
+     * @param endY The y-coordinate of the swipe end point
+     * @param deltaValue delta in pixels between every touch point on the line between start and end points
+     * @param durationValue Swipe duration
      */
     class SwipeCmdRequestBody(
         startX: Double,

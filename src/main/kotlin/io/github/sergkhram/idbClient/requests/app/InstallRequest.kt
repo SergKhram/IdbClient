@@ -13,11 +13,11 @@ import java.io.File
 
 /**
  * Install an application
- * @param bundlePath - Path to the .app/.ipa to install. Note that .app bundles will usually be faster to install than
+ * @param bundlePath Path to the .app/.ipa to install. Note that .app bundles will usually be faster to install than
  * .ipa files.
- * @param makeDebuggable - If set, will persist the application bundle alongside the iOS Target, this is needed for
+ * @param makeDebuggable If set, will persist the application bundle alongside the iOS Target, this is needed for
  * debug server commands to function
- * @param overrideMTime - If set, idb will disregard the mtime of files contained in an .ipa file. Current timestamp
+ * @param overrideMTime If set, idb will disregard the mtime of files contained in an .ipa file. Current timestamp
  * will be used as modification time. Use this flag to ensure app updates work properly when your build system
  * normalises the timestamps of contents of archives.
  */

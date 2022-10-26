@@ -13,10 +13,10 @@ import kotlin.io.path.deleteIfExists
 
 /**
  * Copy file(s) from local machine to target
- * @param srcPath - Path of file(s) to copy to the target
- * @param dstPath - Directory relative to the data container of the application to copy the files into.
+ * @param srcPath Path of file(s) to copy to the target
+ * @param dstPath Directory relative to the data container of the application to copy the files into.
  * Will be created if non-existent.
- * @param container - File container(Default is ROOT)
+ * @param container File container(Default is ROOT)
  */
 class PushRequest(
     private val srcPath: String,
