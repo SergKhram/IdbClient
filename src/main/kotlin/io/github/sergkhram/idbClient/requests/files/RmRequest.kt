@@ -8,8 +8,8 @@ import io.github.sergkhram.idbClient.requests.IdbRequest
 
 /**
  * Remove an item inside a container
- * @param paths - Path of item to remove (A directory will be recursively deleted)
- * @param container - File container(Default is ROOT)
+ * @param paths Path of item to remove (A directory will be recursively deleted)
+ * @param container File container(Default is ROOT)
  */
 class RmRequest(
     private val paths: List<String>,

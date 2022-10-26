@@ -11,7 +11,7 @@ import kotlin.io.path.deleteIfExists
 
 /**
  * Add photos/videos to the target
- * @param filePaths - Paths to all media files to add
+ * @param filePaths Paths to all media files to add
  */
 class AddMediaRequest(private val filePaths: List<String>): IdbRequest<AddMediaResponse>(){
     override suspend fun execute(client: GrpcClient): AddMediaResponse {

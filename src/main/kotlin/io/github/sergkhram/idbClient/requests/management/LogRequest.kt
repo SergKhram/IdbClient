@@ -11,8 +11,8 @@ import java.time.Duration
 
 /**
  * Obtain logs from the target or the companion
- * @param source - TARGET or COMPANION
- * @param arguments - Possible arguments:
+ * @param source TARGET or COMPANION
+ * @param arguments Possible arguments:
 [system | process (pid|process) | parent (pid|process) ]
 [ level default|info|debug][ predicate <predicate> ]
 [ source ][ style (syslog|json) ]

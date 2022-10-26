@@ -9,9 +9,9 @@ import io.github.sergkhram.idbClient.requests.IdbRequest
 
 /**
  * Move a path inside an application's container
- * @param srcPaths - Source paths relative to Container
- * @param dstPath - Destination path relative to Container
- * @param container - File container(Default is ROOT)
+ * @param srcPaths Source paths relative to Container
+ * @param dstPath Destination path relative to Container
+ * @param container File container(Default is ROOT)
  */
 class MvRequest(
     private val srcPaths: List<String>,

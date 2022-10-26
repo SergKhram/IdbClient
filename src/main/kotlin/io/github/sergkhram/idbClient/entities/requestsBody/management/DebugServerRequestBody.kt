@@ -7,7 +7,7 @@ sealed class DebugServerRequestBody {
 
     /**
      * Start the Debug Server
-     * @param bundleId - The bundle id to debug
+     * @param bundleId The bundle id to debug
      */
     class DebugServerStartRequest(bundleId: String) : DebugServerRequestBody() {
         override val requestBody: DebugServerRequest = DebugServerRequest.newBuilder()

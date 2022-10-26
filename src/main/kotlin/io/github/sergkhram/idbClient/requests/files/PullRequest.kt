@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.map
 
 /**
  * Copy a file inside an application's container
- * @param srcPath - Relative Container source path
- * @param container - File container(Default is ROOT)
+ * @param srcPath Relative Container source path
+ * @param container File container(Default is ROOT)
  */
 class PullRequest(
     private val srcPath: String,

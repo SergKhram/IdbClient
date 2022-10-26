@@ -7,8 +7,8 @@ sealed class LsRequestBody {
 
     /**
      * List a path inside an application's container with multiple paths
-     * @param paths - List of source paths
-     * @param container - File container(Default is ROOT)
+     * @param paths List of source paths
+     * @param container File container(Default is ROOT)
      */
     class MultipleLsRequestBody(
         paths: List<String>,
@@ -21,8 +21,8 @@ sealed class LsRequestBody {
 
     /**
      * List a path inside an application's container with single path
-     * @param path - Source path
-     * @param container - File container(Default is ROOT)
+     * @param path Source path
+     * @param container File container(Default is ROOT)
      */
     class SingleLsRequestBody(
         path: String,

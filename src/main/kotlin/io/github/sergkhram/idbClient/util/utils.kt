@@ -62,7 +62,7 @@ fun unpackBytes(data: ByteArray): ByteArray {
 }
 
 /**
- * @param transformFunc - if bytes data from flow is compressed you can use this param to unpack this data before
+ * @param transformFunc if bytes data from flow is compressed you can use this param to unpack this data before
  * creating file
  */
 suspend fun Flow<ByteArray>.exportFile(

@@ -10,10 +10,10 @@ import java.time.Duration
 
 /**
  * Stream raw H264 from the target
- * @param fps - The frame rate of the stream. Default is a dynamic fps
- * @param videoFormat - The format of the stream
- * @param compressionQuality - The compression quality (between 0 and 1.0) for the stream
- * @param scaleFactor - The scale factor for the source video (between 0 and 1.0) for the stream
+ * @param fps The frame rate of the stream. Default is a dynamic fps
+ * @param videoFormat The format of the stream
+ * @param compressionQuality The compression quality (between 0 and 1.0) for the stream
+ * @param scaleFactor The scale factor for the source video (between 0 and 1.0) for the stream
  */
 class VideoStreamRequest(
     private val fps: Long,
