@@ -19,7 +19,7 @@ object GrpcErrorHandler {
             if(exception.isInstance(e.status.cause)
                 && predicate.invoke()
             ) {
-                log.debug("${exception.simpleName} is caught - retrying execute request")
+                log.warn("${exception.simpleName} is caught - retrying execute request")
                 actionAfterCatch.invoke()
                 block.invoke()
             } else {

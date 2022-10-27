@@ -1,6 +1,5 @@
 package io.github.sergkhram.idbClient
 
-
 object Const {
     const val localIdbCompanionPath = "/usr/local/bin/idb_companion"
     val localTargetsListCmd = listOf(localIdbCompanionPath, "--list", "1", "--json")
