@@ -14,13 +14,11 @@ class CreateIdbClientTest: BaseTest() {
             val idb = IOSDebugBridgeClient()
             val address = TcpAddress("127.0.0.1", 10882)
             val udid = idb.connectToCompanion(address)
-            udid?.let {
-                log.info { "$it - companion connected" }
-                val list = idb.getTargetsList()
-                Assertions.assertEquals(1, list.size)
-                Assertions.assertEquals(address, list.first().address)
-                Assertions.assertEquals(it, list.first().targetDescription.udid)
-            }
+            log.info { "$udid - companion connected" }
+            val list = idb.getTargetsList()
+            Assertions.assertEquals(1, list.size)
+            Assertions.assertEquals(address, list.first().address)
+            Assertions.assertEquals(udid, list.first().targetDescription.udid)
         }
     }
 
@@ -32,10 +30,8 @@ class CreateIdbClientTest: BaseTest() {
                 listOfCompanions = listOf(address)
             )
             val list = idb.getTargetsList()
-            list.takeIf { it.isNotEmpty() }?.let {
-                Assertions.assertEquals(1, list.size)
-                Assertions.assertEquals(address, it.first().address)
-            }
+            Assertions.assertEquals(1, list.size)
+            Assertions.assertEquals(address, list.first().address)
         }
     }
 }
