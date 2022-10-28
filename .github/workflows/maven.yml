@@ -29,8 +29,8 @@ jobs:
     - name: Setup simulator
       uses: futureware-tech/simulator-action@v2
       with:
-        model: 'iPhone 10'
-        udid: '2CC807A9-FF8A-4BEA-BE3D-8D5FE2A2343C'
+        model: 'iPhone 13'
+        udid: '0336474D-27B1-4220-8EC9-DD82EDEBC404'
     - name: Install idb
       run: |
         brew update
@@ -39,7 +39,7 @@ jobs:
         brew upgrade
     - name: Run idb companion
       run: |
-        idb_companion --udid 2CC807A9-FF8A-4BEA-BE3D-8D5FE2A2343C --grpc-port 10882
+        idb_companion --udid 0336474D-27B1-4220-8EC9-DD82EDEBC404 --grpc-port 10882
     - name: Build with Maven
       run: mvn clean -B package --file pom.xml -DskipTests
     - name: Test with Maven
