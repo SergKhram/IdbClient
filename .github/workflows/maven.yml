@@ -46,4 +46,4 @@ jobs:
       run: mvn test --file pom.xml
     - name: Stop idb
       run: |
-        kill $(ps aux | grep idb | grep -v grep | awk '{print $2}')
+        pkill idb_companion

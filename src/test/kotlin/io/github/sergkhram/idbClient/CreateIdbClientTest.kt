@@ -1,13 +1,12 @@
 package io.github.sergkhram.idbClient
 
 import io.github.sergkhram.idbClient.entities.address.TcpAddress
-import io.github.sergkhram.idbClient.logs.KLogger
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class CreateIdbClientTest {
-    private val log = KLogger.logger
+
+class CreateIdbClientTest: BaseTest() {
 
     @Test
     fun simpleCreateIdbClientTest() {
@@ -16,7 +15,7 @@ class CreateIdbClientTest {
             val address = TcpAddress("127.0.0.1", 10882)
             val udid = idb.connectToCompanion(address)
             udid?.let {
-                log.info { it }
+                log.info { "$it - companion connected" }
                 val list = idb.getTargetsList()
                 Assertions.assertEquals(1, list.size)
                 Assertions.assertEquals(address, list.first().address)
