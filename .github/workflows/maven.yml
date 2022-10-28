@@ -30,7 +30,6 @@ jobs:
       uses: futureware-tech/simulator-action@v2
       with:
         model: 'iPhone 13'
-        udid: '0336474D-27B1-4220-8EC9-DD82EDEBC404'
     - name: Install idb
       run: |
         brew update
