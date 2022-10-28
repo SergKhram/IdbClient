@@ -39,7 +39,11 @@ jobs:
         brew upgrade
     - name: Run idb companion
       run: |
-        idb_companion --udid ${{steps.simulator.outputs.udid}} --grpc-port 10882
+        idb_companion --udid ${{steps.simulator.outputs.udid}} --grpc-port 10882 >/dev/null 2>&1
+    - name: Sleep for 20 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '20s'
     - name: Build with Maven
       run: mvn clean -B package --file pom.xml -DskipTests
     - name: Test with Maven
