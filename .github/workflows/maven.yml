@@ -36,12 +36,14 @@ jobs:
         brew update
         brew tap facebook/fb
         brew install idb-companion
-        brew upgrade
     - name: Run idb companion
       run: |
         idb_companion --udid ${{steps.simulator.outputs.udid}} --grpc-port 10882 >/dev/null 2>&1 &
     - name: Build with Maven
       run: mvn clean -B package --file pom.xml -DskipTests
+    - name: Echo idb companion's processes
+      run: |
+        ps aux | grep idb
     - name: Test with Maven
       run: mvn test --file pom.xml
     - name: Stop idb
