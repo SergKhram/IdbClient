@@ -40,11 +40,10 @@ jobs:
     - name: Run idb companion
       run: |
         idb_companion --udid ${{steps.simulator.outputs.udid}} --grpc-port 10882 >/dev/null 2>&1 &
-    - name: Sleep for 10 seconds
-      uses: jakejarvis/wait-action@master
-      with:
-        time: '10s'
     - name: Build with Maven
       run: mvn clean -B package --file pom.xml -DskipTests
     - name: Test with Maven
       run: mvn test --file pom.xml
+    - name: Stop idb
+      run: |
+        kill $(ps aux | grep idb | grep -v grep | awk '{print $2}')
