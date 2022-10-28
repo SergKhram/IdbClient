@@ -31,7 +31,6 @@ jobs:
       with:
         model: 'iPhone 10'
         udid: '2CC807A9-FF8A-4BEA-BE3D-8D5FE2A2343C'
-      run: flutter drive
     - name: Install idb
       run: |
         brew update
