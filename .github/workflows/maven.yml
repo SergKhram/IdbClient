@@ -1,0 +1,47 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "develop", "main" ]
+  pull_request:
+    branches: [ "develop", "main" ]
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest-stable
+    - name: Setup simulator
+      uses: futureware-tech/simulator-action@v2
+      with:
+        model: 'iPhone 10'
+        udid: '2CC807A9-FF8A-4BEA-BE3D-8D5FE2A2343C'
+      run: flutter drive
+    - name: Install idb
+      run: |
+        brew update
+        brew tap facebook/fb
+        brew install idb-companion
+        brew upgrade
+    - name: Run idb companion
+      run: |
+        idb_companion --udid 2CC807A9-FF8A-4BEA-BE3D-8D5FE2A2343C --grpc-port 10882
+    - name: Build with Maven
+      run: mvn clean -B package --file pom.xml -DskipTests
+    - name: Test with Maven
+      run: mvn test --file pom.xml
