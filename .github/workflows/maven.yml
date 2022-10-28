@@ -44,6 +44,7 @@ jobs:
     - name: Echo idb companion's processes
       run: |
         ps aux | grep idb
+        lsof -i -P | grep idb
     - name: Test with Maven
       run: mvn test --file pom.xml
     - name: Stop idb
