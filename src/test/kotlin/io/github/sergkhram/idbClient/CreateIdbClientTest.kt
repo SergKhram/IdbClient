@@ -39,21 +39,21 @@ class CreateIdbClientTest: BaseTest() {
 //            Assertions.assertEquals(address, list.first().address)
 //        }
 //    }
-
-    @Test
-    fun createChannelManuallyTest() {
-        runBlocking {
-            val channel = ManagedChannelBuilder.forAddress("127.0.0.1", 10882).usePlaintext().build()
-            log.info { "ManagedChannel " + channel.isShutdown.toString() }
-            log.info { "ManagedChannel " + channel.isTerminated.toString() }
-            log.info { "ManagedChannel " + channel.getState(false).toString() }
-            val connectionResponse = CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel).connect(
-                ConnectRequest.getDefaultInstance()
-            )
-            val udid = connectionResponse.companion.udid
-            log.info { "ManagedChannel $udid - companion connected" }
-        }
-    }
+//
+//    @Test
+//    fun createChannelManuallyTest() {
+//        runBlocking {
+//            val channel = ManagedChannelBuilder.forAddress("127.0.0.1", 10882).usePlaintext().build()
+//            log.info { "ManagedChannel " + channel.isShutdown.toString() }
+//            log.info { "ManagedChannel " + channel.isTerminated.toString() }
+//            log.info { "ManagedChannel " + channel.getState(false).toString() }
+//            val connectionResponse = CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel).connect(
+//                ConnectRequest.getDefaultInstance()
+//            )
+//            val udid = connectionResponse.companion.udid
+//            log.info { "ManagedChannel $udid - companion connected" }
+//        }
+//    }
 
     @Test
     fun createAnotherTypeChannelManuallyTest() {
