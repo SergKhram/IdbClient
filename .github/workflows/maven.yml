@@ -38,19 +38,19 @@ jobs:
         brew install idb-companion
     - name: Run idb companion
       run: |
-        idb_companion --udid ${{steps.simulator.outputs.udid}} --grpc-port 10882 >out.txt 2>&1 &
-#    - name: Build with Maven
-#      run: mvn clean -B package --file pom.xml -DskipTests
-#    - name: Echo idb companion's processes
-#      run: |
-#        ps aux | grep idb
-#        lsof -i -P | grep idb
+        idb_companion --udid ${{steps.simulator.outputs.udid}} --grpc-port 10882 >idbLog.txt 2>&1 &
+    - name: Build with Maven
+      run: mvn clean -B package --file pom.xml -DskipTests
+    - name: Echo idb_companion' processes
+      run: |
+        ps aux | grep idb
+        lsof -i -P | grep idb
     - name: Test with Maven
-      run: mvn clean -B test --file pom.xml
-    - name: Print out.txt
+      run: mvn test --file pom.xml
+    - name: Print idb_companion' log
       if: always()
       run: |
-        cat out.txt
+        cat idbLog.txt
     - name: Stop idb
       run: |
         pkill idb_companion
