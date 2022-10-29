@@ -47,6 +47,11 @@ jobs:
         lsof -i -P | grep idb
     - name: Test with Maven
       run: mvn test --file pom.xml
+    - name: Echo idb companion's processes after tests
+        if: success() || failure()
+        run: |
+          ps aux | grep idb
+          lsof -i -P | grep idb
     - name: Stop idb
       run: |
         pkill idb_companion
