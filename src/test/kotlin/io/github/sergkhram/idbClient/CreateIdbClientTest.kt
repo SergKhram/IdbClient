@@ -5,7 +5,10 @@ import idb.ConnectRequest
 import io.grpc.ManagedChannelBuilder
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
+import java.net.Socket
 
 
 class CreateIdbClientTest: BaseTest() {
@@ -64,6 +67,26 @@ class CreateIdbClientTest: BaseTest() {
             )
             val udid = connectionResponse.companion.udid
             log.info { "NettyChannel $udid - companion connected" }
+        }
+    }
+
+    @Test
+    fun connectToIdbCompanionTest() {
+        Assertions.assertTrue(serverListening("127.0.0.1", 10882));
+    }
+
+    private fun serverListening(host: String?, port: Int): Boolean {
+        var s: Socket? = null
+        return try {
+            s = Socket(host, port)
+            true
+        } catch (e: Exception) {
+            false
+        } finally {
+            if (s != null) try {
+                s.close()
+            } catch (e: Exception) {
+            }
         }
     }
 }
