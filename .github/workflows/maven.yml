@@ -39,6 +39,10 @@ jobs:
     - name: Run idb companion
       run: |
         idb_companion --udid ${{steps.simulator.outputs.udid}} --grpc-port 10882 >/dev/null 2>&1 &
+    - name: Echo idb companion's processes before build
+      run: |
+        ps aux | grep idb
+        lsof -i -P | grep idb
     - name: Build with Maven
       run: mvn clean -B package --file pom.xml -DskipTests
     - name: Echo idb companion's processes
