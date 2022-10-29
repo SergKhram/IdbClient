@@ -46,7 +46,7 @@ jobs:
 #        ps aux | grep idb
 #        lsof -i -P | grep idb
     - name: Test with Maven
-      run: mvn clean test --file pom.xml
+      run: mvn clean -B test --file pom.xml
     - name: Stop idb
       run: |
         pkill idb_companion

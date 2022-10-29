@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.net.Socket
+import java.util.concurrent.TimeUnit
 
 
 class CreateIdbClientTest: BaseTest() {
@@ -39,26 +40,30 @@ class CreateIdbClientTest: BaseTest() {
 //            Assertions.assertEquals(address, list.first().address)
 //        }
 //    }
-
-    @Test
-    fun createChannelManuallyTest() {
-        runBlocking {
-            val channel = ManagedChannelBuilder.forAddress("127.0.0.1", 10882).usePlaintext().build()
-            log.info { "ManagedChannel " + channel.isShutdown.toString() }
-            log.info { "ManagedChannel " + channel.isTerminated.toString() }
-            log.info { "ManagedChannel " + channel.getState(false).toString() }
-            val connectionResponse = CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel).connect(
-                ConnectRequest.getDefaultInstance()
-            )
-            val udid = connectionResponse.companion.udid
-            log.info { "ManagedChannel $udid - companion connected" }
-        }
-    }
+//
+//    @Test
+//    fun createChannelManuallyTest() {
+//        runBlocking {
+//            val channel = ManagedChannelBuilder.forAddress("127.0.0.1", 10882).usePlaintext().build()
+//            log.info { "ManagedChannel " + channel.isShutdown.toString() }
+//            log.info { "ManagedChannel " + channel.isTerminated.toString() }
+//            log.info { "ManagedChannel " + channel.getState(false).toString() }
+//            val connectionResponse = CompanionServiceGrpcKt.CompanionServiceCoroutineStub(channel).connect(
+//                ConnectRequest.getDefaultInstance()
+//            )
+//            val udid = connectionResponse.companion.udid
+//            log.info { "ManagedChannel $udid - companion connected" }
+//        }
+//    }
 
     @Test
     fun createAnotherTypeChannelManuallyTest() {
         runBlocking {
-            val channel = NettyChannelBuilder.forAddress("127.0.0.1", 10882).usePlaintext().build()
+            val channel = NettyChannelBuilder.forAddress("127.0.0.1", 10882)
+                .keepAliveTime(5, TimeUnit.MINUTES)
+                .idleTimeout(5, TimeUnit.MINUTES)
+                .keepAliveWithoutCalls(true)
+                .usePlaintext().build()
             log.info { "NettyChannel " + channel.isShutdown.toString() }
             log.info { "NettyChannel " + channel.isTerminated.toString() }
             log.info { "NettyChannel " + channel.getState(false).toString() }
