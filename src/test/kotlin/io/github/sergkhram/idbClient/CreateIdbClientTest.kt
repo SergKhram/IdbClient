@@ -3,8 +3,10 @@ package io.github.sergkhram.idbClient
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledOnOs
+import org.junit.jupiter.api.condition.OS
 
-
+@EnabledOnOs(OS.MAC)
 class CreateIdbClientTest: BaseTest() {
 
     @Test
