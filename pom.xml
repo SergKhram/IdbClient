@@ -46,7 +46,8 @@
         <commons.io.version>2.11.0</commons.io.version>
         <kotlin.logging.version>2.1.23</kotlin.logging.version>
         <zt.zip.version>1.15</zt.zip.version>
-        <junit.version>5.7.2</junit.version>
+        <junit.version>5.8.0</junit.version>
+        <assertj.version>3.23.1</assertj.version>
     </properties>
 
     <repositories>
@@ -165,7 +166,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.23.1</version>
+            <version>${assertj.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
