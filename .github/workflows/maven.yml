@@ -26,6 +26,11 @@ jobs:
       with:
         model: 'iPhone 13'
       id: simulator
+    - name: Setup second simulator
+      uses: futureware-tech/simulator-action@v2
+      with:
+        model: 'iPhone 14'
+      id: second-simulator
     - name: Install idb
       run: |
         brew update
@@ -41,7 +46,7 @@ jobs:
         ps aux | grep idb
         lsof -i -P | grep idb
     - name: Test with Maven
-      run: mvn test --file pom.xml
+      run: mvn test --file pom.xml -DsecondSimulator=${{steps.second-simulator.outputs.udid}}
     - name: Print idb_companion' log
       if: always()
       run: |

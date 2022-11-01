@@ -10,3 +10,5 @@ fun getResourceFile(clazz: Class<out Any>, fileName: String): File {
 const val expectedFile = "expectedDirectory/expected.txt"
 const val expectedDir = "expectedDirectory"
 const val expectedGzip = "expected.txt.gz"
+
+val secondSimulatorUdid = System.getProperty("secondSimulator")?.toString() ?: ""
