@@ -1,23 +1,19 @@
-package io.github.sergkhram.idbClient.utilTests
+package io.github.sergkhram.idbClient.util
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.sergkhram.idbClient.*
-import io.github.sergkhram.idbClient.util.*
 import io.grpc.ConnectivityState
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.DisabledOnOs
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
-import org.junit.jupiter.api.extension.ExtendWith
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.name
 
 
-@ExtendWith(SoftAssertionsExtension::class)
 class UtilsTest: BaseTest() {
 
     @Test
