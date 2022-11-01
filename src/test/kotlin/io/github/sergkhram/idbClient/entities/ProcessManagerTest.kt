@@ -59,7 +59,7 @@ class ProcessManagerTest: BaseTest() {
     }
 
     @Test
-    fun checkAvailableTest(softly: SoftAssertions) {
+    fun checkIsPortAvailableTest(softly: SoftAssertions) {
         val port = getFreePortMethod().invoke(ProcessManager) as Int
         softly.assertThat(available(port)).isTrue
         ss = ServerSocket(port)
