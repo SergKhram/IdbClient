@@ -10,6 +10,7 @@ import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
 import io.github.sergkhram.idbClient.logs.KLogger
+import io.github.sergkhram.idbClient.util.destroyImmediately
 import io.github.sergkhram.idbClient.util.prepareManagedChannel
 import io.grpc.ManagedChannel
 import io.grpc.Status
@@ -56,8 +57,7 @@ internal class GrpcClient(
         log.debug("gRPC client ${this.hashCode()} shutdown started")
         if (companionData.isLocal) {
             if (this::channel.isInitialized) channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
-            process?.takeIf { it.isAlive }?.descendants()?.forEach{ pd -> pd.destroyForcibly() }
-            process?.takeIf { it.isAlive }?.destroyForcibly()
+            process?.destroyImmediately()
         }
         log.debug("gRPC client ${this.hashCode()} shutdown completed")
     }
@@ -70,7 +70,7 @@ internal class GrpcClient(
                 }
             }
         } catch (e: TimeoutCancellationException) {
-            process?.takeIf { it.isAlive }?.descendants()?.forEach{ pd -> pd.destroyForcibly() }
+            process?.descendants()?.forEach{ pd -> pd.destroyForcibly() }
             process?.destroyForcibly()
             throw StatusException(
                 Status.ABORTED.withDescription("Start local companion($udid) process failed")

@@ -6,6 +6,7 @@ import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.util.beautifyJsonString
 import io.github.sergkhram.idbClient.util.cmdBuilder
+import io.github.sergkhram.idbClient.util.destroyImmediately
 import java.io.IOException
 import java.net.ServerSocket
 
@@ -36,8 +37,7 @@ internal object ProcessManager {
         } catch (e: IOException) {
             log.info(e.localizedMessage, e)
         } finally {
-            process?.takeIf { it.isAlive }?.descendants()?.forEach{ pd -> pd.destroyForcibly() }
-            process?.takeIf { it.isAlive }?.destroyForcibly()
+            process?.destroyImmediately()
         }
         return output?.beautifyJsonString()
     }
