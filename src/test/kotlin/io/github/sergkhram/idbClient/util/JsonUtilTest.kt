@@ -26,6 +26,4 @@ class JsonUtilTest: BaseTest() {
             actual
         )
     }
-
-
 }

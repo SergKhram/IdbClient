@@ -4,6 +4,7 @@ import io.github.sergkhram.idbClient.BaseTest
 import io.github.sergkhram.idbClient.entities.ProcessManager.available
 import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.ProcessManager.startLocalCompanion
+import io.github.sergkhram.idbClient.getFreePortMethod
 import io.github.sergkhram.idbClient.secondSimulatorUdid
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -11,7 +12,6 @@ import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
-import java.lang.reflect.Method
 import java.net.ServerSocket
 
 class ProcessManagerTest: BaseTest() {
@@ -20,7 +20,7 @@ class ProcessManagerTest: BaseTest() {
 
     @AfterEach
     fun afterEach() {
-        process?.destroy()
+        process?.destroyForcibly()
         ss?.close()
     }
 
@@ -65,11 +65,5 @@ class ProcessManagerTest: BaseTest() {
         ss = ServerSocket(port)
         softly.assertThat(available(port)).isFalse
         softly.assertAll()
-    }
-
-    private fun getFreePortMethod(): Method {
-        val portMethod = ProcessManager::class.java.getDeclaredMethod("getFreePort")
-        portMethod.isAccessible = true
-        return portMethod
     }
 }

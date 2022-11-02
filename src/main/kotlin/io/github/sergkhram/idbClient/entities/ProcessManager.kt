@@ -36,7 +36,8 @@ internal object ProcessManager {
         } catch (e: IOException) {
             log.info(e.localizedMessage, e)
         } finally {
-            process?.takeIf { it.isAlive }?.destroy()
+            process?.takeIf { it.isAlive }?.descendants()?.forEach{ pd -> pd.destroyForcibly() }
+            process?.takeIf { it.isAlive }?.destroyForcibly()
         }
         return output?.beautifyJsonString()
     }

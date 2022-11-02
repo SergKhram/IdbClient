@@ -56,7 +56,8 @@ internal class GrpcClient(
         log.debug("gRPC client ${this.hashCode()} shutdown started")
         if (companionData.isLocal) {
             if (this::channel.isInitialized) channel.shutdown().awaitTermination(5, TimeUnit.SECONDS)
-            process?.takeIf { it.isAlive }?.destroy()
+            process?.takeIf { it.isAlive }?.descendants()?.forEach{ pd -> pd.destroyForcibly() }
+            process?.takeIf { it.isAlive }?.destroyForcibly()
         }
         log.debug("gRPC client ${this.hashCode()} shutdown completed")
     }
@@ -69,7 +70,8 @@ internal class GrpcClient(
                 }
             }
         } catch (e: TimeoutCancellationException) {
-            process?.destroy()
+            process?.takeIf { it.isAlive }?.descendants()?.forEach{ pd -> pd.destroyForcibly() }
+            process?.destroyForcibly()
             throw StatusException(
                 Status.ABORTED.withDescription("Start local companion($udid) process failed")
             )
