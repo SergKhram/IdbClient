@@ -6,7 +6,6 @@ import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.util.beautifyJsonString
 import io.github.sergkhram.idbClient.util.cmdBuilder
-import io.github.sergkhram.idbClient.util.destroyImmediately
 import java.io.IOException
 import java.net.ServerSocket
 
@@ -15,7 +14,7 @@ internal object ProcessManager {
     private val log = KLogger.logger
 
     @Synchronized
-    fun startLocalCompanion(udid: String): Pair<Process, Int> {
+    internal fun startLocalCompanion(udid: String): Pair<Process, Int> {
         val port = getFreePort()
         val processBuilder = cmdBuilder(
             startLocalCompanionCmd(
@@ -27,7 +26,7 @@ internal object ProcessManager {
         return Pair(process, port)
     }
 
-    fun getLocalTargetsJson(): JsonNode? {
+    internal fun getLocalTargetsJson(): JsonNode? {
         var process: Process? = null
         var output: String? = null
         try {
@@ -46,7 +45,7 @@ internal object ProcessManager {
         return ServerSocket(0).use { socket -> socket.localPort }
     }
 
-    fun available(port: Int): Boolean {
+    internal fun available(port: Int): Boolean {
         var ss: ServerSocket? = null
         try {
             ss = ServerSocket(port)
@@ -60,4 +59,11 @@ internal object ProcessManager {
         }
         return false
     }
+
+
+    internal fun Process.destroyImmediately() =
+        takeIf { it.isAlive }?.let {
+            it.descendants()?.forEach{ pd -> pd.destroyForcibly() }
+            it.destroyForcibly()
+        }
 }

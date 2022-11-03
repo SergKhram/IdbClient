@@ -4,13 +4,13 @@ import idb.CompanionServiceGrpcKt
 import io.github.sergkhram.idbClient.Const.localGrpcStartTimeout
 import io.github.sergkhram.idbClient.Const.localHost
 import io.github.sergkhram.idbClient.entities.ProcessManager.available
+import io.github.sergkhram.idbClient.entities.ProcessManager.destroyImmediately
 import io.github.sergkhram.idbClient.entities.ProcessManager.startLocalCompanion
 import io.github.sergkhram.idbClient.entities.address.TcpAddress
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
 import io.github.sergkhram.idbClient.logs.KLogger
-import io.github.sergkhram.idbClient.util.destroyImmediately
 import io.github.sergkhram.idbClient.util.prepareManagedChannel
 import io.grpc.ManagedChannel
 import io.grpc.Status

@@ -106,9 +106,3 @@ internal fun String.beautifyJsonString() = JsonUtil.convertStringToJsonNode(
         )
     }]"
 )
-
-internal fun Process.destroyImmediately() =
-    takeIf { it.isAlive }?.let {
-        it.descendants()?.forEach{ pd -> pd.destroyForcibly() }
-        it.destroyForcibly()
-    }
