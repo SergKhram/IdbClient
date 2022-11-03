@@ -15,8 +15,8 @@ import org.junit.jupiter.api.condition.OS
 import java.net.ServerSocket
 
 class ProcessManagerTest: BaseTest() {
-    var process: Process? = null
-    var ss: ServerSocket? = null
+    private var process: Process? = null
+    private var ss: ServerSocket? = null
 
     @AfterEach
     fun afterEach() {

@@ -26,20 +26,28 @@ import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
 class GrpcClientTest: BaseTest() {
-    var process: Process? = null
-    var channel: ManagedChannel? = null
-    var ss: ServerSocket? = null
+    private var process: Process? = null
+    private var channel: ManagedChannel? = null
+    private var ss: ServerSocket? = null
 
     @OptIn(DelicateCoroutinesApi::class)
     @AfterEach
     fun afterEach() {
-        GlobalScope.launch {
-            channel?.shutdownNow()
-            process?.descendants()?.forEach { it.destroyForcibly() }
-            process?.destroyForcibly()
-        }
-        GlobalScope.launch {
-            ss?.close()
+        runBlocking {
+            val jobs: MutableList<Deferred<*>> = mutableListOf()
+            jobs.addAll(
+                listOf(
+                    GlobalScope.async {
+                        channel?.shutdownNow()
+                        process?.descendants()?.forEach { it.destroyForcibly() }
+                        process?.destroyForcibly()
+                    },
+                    GlobalScope.async {
+                        ss?.close()
+                    }
+                )
+            )
+            jobs.awaitAll()
         }
     }
 
