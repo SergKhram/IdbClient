@@ -15,6 +15,7 @@ import kotlin.io.path.name
 
 
 class UtilsTest: BaseTest() {
+    private val clazz = this::class.java
 
     @Test
     fun checkCmdBuilderTest() {
@@ -30,7 +31,7 @@ class UtilsTest: BaseTest() {
     @Test
     fun checkCompressFileTest() {
         val compressedFile = compress(
-            getResourceFile(this::class.java, expectedFile).path
+            getResourceFile(clazz, expectedFile).path
         )
 
         assertThat(compressedFile.name).contains(".zip")
@@ -40,7 +41,7 @@ class UtilsTest: BaseTest() {
     @Test
     fun checkCompressDirTest() {
         val compressedFile = compress(
-            getResourceFile(this::class.java, expectedDir).path
+            getResourceFile(clazz, expectedDir).path
         )
 
         assertThat(compressedFile.name).contains(".zip")
@@ -50,7 +51,7 @@ class UtilsTest: BaseTest() {
     @Test
     fun checkUnpackGzipTest() {
         val byteArray = unpackGzip(
-            getResourceFile(this::class.java, expectedGzip)
+            getResourceFile(clazz, expectedGzip)
         )
 
         Assertions.assertEquals(
@@ -62,7 +63,7 @@ class UtilsTest: BaseTest() {
     @Test
     fun checkUnpackBytesTest() {
         val byteArray = unpackBytes(
-            getResourceFile(this::class.java, expectedGzip).readBytes()
+            getResourceFile(clazz, expectedGzip).readBytes()
         )
 
         Assertions.assertEquals(

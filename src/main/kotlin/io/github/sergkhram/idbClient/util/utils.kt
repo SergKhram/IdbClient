@@ -47,11 +47,12 @@ internal fun compress(srcPath: String): Path {
     return zipPath
 }
 
-internal fun unpackGzip(gzipFile: File): ByteArray {
-    return GZIPInputStream(
+internal fun unpackGzip(gzipFile: File) =
+    GZIPInputStream(
         FileInputStream(gzipFile)
-    ).use(GZIPInputStream::readAllBytes)
-}
+    ).use(
+        GZIPInputStream::readAllBytes
+    )
 
 fun unpackBytes(data: ByteArray): ByteArray {
     val gzipFile = kotlin.io.path.createTempFile(suffix = ".gz")
