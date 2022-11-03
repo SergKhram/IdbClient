@@ -60,7 +60,6 @@ internal object ProcessManager {
         return false
     }
 
-
     internal fun Process.destroyImmediately() =
         takeIf { it.isAlive }?.let {
             it.descendants()?.forEach{ pd -> pd.destroyForcibly() }

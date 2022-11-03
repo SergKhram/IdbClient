@@ -39,7 +39,9 @@ class GrpcClientTest: BaseTest() {
                 listOf(
                     GlobalScope.async {
                         channel?.shutdownNow()
-                        process?.descendants()?.forEach { it.destroyForcibly() }
+                        process?.descendants()?.forEach {
+                            it.destroyForcibly()
+                        }
                         process?.destroyForcibly()
                     },
                     GlobalScope.async {
@@ -91,7 +93,11 @@ class GrpcClientTest: BaseTest() {
         runBlocking {
             val client = GrpcClient(LocalCompanionData("udid"))
             assertDoesNotThrow {
-                getWaitUntilLocalCompanionStartedMethod().callSuspend(client, port, "udid")
+                getWaitUntilLocalCompanionStartedMethod().callSuspend(
+                    client,
+                    port,
+                    "udid"
+                )
             }
         }
     }
@@ -102,10 +108,16 @@ class GrpcClientTest: BaseTest() {
         runBlocking {
             val client = GrpcClient(LocalCompanionData("udid"))
             val exception = assertThrows<StatusException> {
-                getWaitUntilLocalCompanionStartedMethod().callSuspend(client, port, "udid")
+                getWaitUntilLocalCompanionStartedMethod().callSuspend(
+                    client,
+                    port,
+                    "udid"
+                )
             }
-            softly.assertThat(exception.status.code).isEqualTo(Status.ABORTED.code)
-            softly.assertThat(exception.status.description).isEqualTo("Start local companion(udid) process failed")
+            softly.assertThat(exception.status.code)
+                .isEqualTo(Status.ABORTED.code)
+            softly.assertThat(exception.status.description)
+                .isEqualTo("Start local companion(udid) process failed")
         }
     }
 
@@ -116,7 +128,11 @@ class GrpcClientTest: BaseTest() {
             val client = GrpcClient(LocalCompanionData("udid"))
             assertDoesNotThrow {
                 val job = async(start = CoroutineStart.LAZY) {
-                    getWaitUntilLocalCompanionStartedMethod().callSuspend(client, port, "udid")
+                    getWaitUntilLocalCompanionStartedMethod().callSuspend(
+                        client,
+                        port,
+                        "udid"
+                    )
                 }
                 job.start()
                 delay(localGrpcStartTimeout/2)
@@ -151,13 +167,17 @@ class GrpcClientTest: BaseTest() {
     }
 
     private fun getWaitUntilLocalCompanionStartedMethod(): KFunction<*> {
-        val waitMethod = GrpcClient::class.declaredFunctions.first { it.name == "waitUntilLocalCompanionStarted" }
+        val waitMethod = GrpcClient::class.declaredFunctions.first {
+            it.name == "waitUntilLocalCompanionStarted"
+        }
         waitMethod.isAccessible = true
         return waitMethod
     }
 
     private fun getStubProperty(client: GrpcClient): Lazy<*> {
-        val stubProperty = GrpcClient::class.memberProperties.first { it.name == "stub" }
+        val stubProperty = GrpcClient::class.memberProperties.first {
+            it.name == "stub"
+        }
         stubProperty.isAccessible = true
         return stubProperty.getDelegate(client) as Lazy<*>
     }
