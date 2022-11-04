@@ -3,10 +3,12 @@ package io.github.sergkhram.idbClient
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
 
 @EnabledOnOs(OS.MAC)
+@EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
 class CreateIdbClientTest: BaseTest() {
 
     @Test

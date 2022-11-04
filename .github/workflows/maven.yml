@@ -46,7 +46,7 @@ jobs:
         ps aux | grep idb
         lsof -i -P | grep idb
     - name: Test with Maven
-      run: mvn test --file pom.xml -DsecondSimulator=${{steps.second-simulator.outputs.udid}}
+      run: mvn test --file pom.xml -DsecondSimulator=${{steps.second-simulator.outputs.udid}} -DwSimulators=true
     - name: Print idb_companion' log
       if: always()
       run: |

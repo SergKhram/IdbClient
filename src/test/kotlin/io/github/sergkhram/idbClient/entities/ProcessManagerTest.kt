@@ -6,10 +6,12 @@ import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.ProcessManager.startLocalCompanion
 import io.github.sergkhram.idbClient.getFreePortMethod
 import io.github.sergkhram.idbClient.secondSimulatorUdid
+import io.github.sergkhram.idbClient.wSimulatorsProperty
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
 import java.net.ServerSocket
@@ -26,6 +28,7 @@ class ProcessManagerTest: BaseTest() {
 
     @Test
     @EnabledOnOs(OS.MAC)
+    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
     fun checkStartLocalCompanionTest(softly: SoftAssertions) {
         val startedSimulatorData = startLocalCompanion(secondSimulatorUdid)
         process = startedSimulatorData.first
@@ -40,6 +43,7 @@ class ProcessManagerTest: BaseTest() {
 
     @Test
     @EnabledOnOs(OS.MAC)
+    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
     fun checkGetLocalTargetsJsonTest(softly: SoftAssertions) {
         val targets = getLocalTargetsJson()
         val udids = targets!!.mapNotNull {

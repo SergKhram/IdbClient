@@ -48,6 +48,7 @@
         <zt.zip.version>1.15</zt.zip.version>
         <junit.version>5.8.0</junit.version>
         <assertj.version>3.23.1</assertj.version>
+        <mockito.version>4.8.0</mockito.version>
     </properties>
 
     <repositories>
@@ -167,6 +168,18 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.grpc</groupId>
+            <artifactId>grpc-testing</artifactId>
+            <version>${grpc.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
