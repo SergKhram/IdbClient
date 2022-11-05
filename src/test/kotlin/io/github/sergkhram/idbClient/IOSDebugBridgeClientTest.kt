@@ -1,15 +1,21 @@
 package io.github.sergkhram.idbClient
 
+import com.google.protobuf.ByteString
 import idb.*
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
+import io.github.sergkhram.idbClient.entities.requestsBody.management.LogSource
+import io.github.sergkhram.idbClient.requests.files.PullRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
+import io.github.sergkhram.idbClient.requests.management.LogRequest
 import io.github.sergkhram.idbClient.util.NoCompanionWithUdidException
 import io.grpc.ManagedChannel
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.SoftAssertions
@@ -17,13 +23,16 @@ import org.junit.jupiter.api.*
 import org.mockito.AdditionalAnswers.delegatesTo
 import org.mockito.Mockito.mock
 import java.lang.reflect.Field
+import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.isAccessible
+import idb.LogRequest as IdbLogRequest
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class IOSDebugBridgeClientTest: BaseTest() {
@@ -34,6 +43,12 @@ class IOSDebugBridgeClientTest: BaseTest() {
     private val defaultDescription = defaultDescriptionAnswer(udid)
     private val serverName = InProcessServerBuilder.generateName()
     private lateinit var channel: ManagedChannel
+    private val listOfLogs = listOf(
+        "Output 1",
+        "Output 2",
+        "Output 3"
+    )
+    val fileBytes = getResourceFile(this::class.java, expectedFile).readBytes()
 
     private val serviceImpl: CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase = mock(
         CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase::class.java, delegatesTo<CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase>(
@@ -46,6 +61,46 @@ class IOSDebugBridgeClientTest: BaseTest() {
                     return ConnectResponse.newBuilder()
                         .setCompanion(defaultDescription.companion)
                         .build()
+                }
+
+                override fun log(request: IdbLogRequest): Flow<LogResponse> {
+                    return flow {
+                        listOfLogs.forEach {
+                            if(it.contains("3")) {
+                                delay(3000)
+                            }
+                            emit(
+                                LogResponse.newBuilder()
+                                    .setOutput(
+                                        ByteString.copyFromUtf8(
+                                            if(request.source.number == LogSource.TARGET.value)
+                                                it
+                                            else
+                                                "$it companion"
+                                        )
+                                    )
+                                    .build()
+                            )
+                        }
+                    }
+                }
+
+                override fun pull(request: idb.PullRequest): Flow<PullResponse> {
+                    return flow {
+                        emit(
+                            PullResponse.newBuilder()
+                                .setPayload(
+                                    Payload.newBuilder()
+                                        .setData(
+                                            ByteString.copyFrom(
+                                                fileBytes
+                                            )
+                                        )
+                                        .build()
+                                )
+                                .build()
+                        )
+                    }
                 }
             })
     )
@@ -169,6 +224,128 @@ class IOSDebugBridgeClientTest: BaseTest() {
             Assertions.assertEquals(
                 "There is no companion with $missingUuid",
                 exception.message
+            )
+        }
+    }
+
+    @Test
+    fun checkExecutePredicateIdbRequestTest() {
+        runBlocking {
+            prepareCompanionForTest()
+            val idbRequest = LogRequest(
+                {false}
+            )
+            val response = assertDoesNotThrow {
+                idbClient.execute(idbRequest, udid)
+            }
+            Assertions.assertEquals(
+                listOfLogs,
+                response
+            )
+        }
+    }
+
+    @Test
+    fun checkExecutePredicateIdbRequestWTimeoutTest() {
+        runBlocking {
+            prepareCompanionForTest()
+            val idbRequest = LogRequest(
+                { false },
+                Duration.ofSeconds(1)
+            )
+            val response = assertDoesNotThrow {
+                idbClient.execute(idbRequest, udid)
+            }
+            Assertions.assertEquals(
+                listOfLogs.dropLast(1),
+                response
+            )
+        }
+    }
+
+    @Test
+    fun checkExecutePredicateIdbRequestWPredicateTest() {
+        runBlocking {
+            prepareCompanionForTest()
+            val atomic = AtomicBoolean(false)
+            val idbRequest = LogRequest(
+                { atomic.get() }
+            )
+            val response = async {
+                assertDoesNotThrow {
+                    idbClient.execute(idbRequest, udid)
+                }
+            }
+            delay(1000)
+            atomic.set(true)
+            Assertions.assertEquals(
+                listOfLogs.dropLast(1),
+                response.await()
+            )
+        }
+    }
+
+    @Test
+    fun checkExecutePredicateIdbRequestWCompanionSourceTest() {
+        runBlocking {
+            prepareCompanionForTest()
+            val idbRequest = LogRequest(
+                { false },
+                source = LogSource.COMPANION
+            )
+            val response = assertDoesNotThrow {
+                idbClient.execute(idbRequest, udid)
+            }
+            Assertions.assertEquals(
+                listOfLogs.map { "$it companion" },
+                response
+            )
+        }
+    }
+
+    @Test
+    fun checkExecutePredicateIdbRequestWExceptionTest() {
+        runBlocking {
+            val idbRequest = LogRequest(
+                { false }
+            )
+            val missingUuid = UUID.randomUUID().toString()
+            val exception = assertThrows<NoCompanionWithUdidException> {
+                idbClient.execute(idbRequest, missingUuid)
+            }
+            Assertions.assertEquals(
+                "There is no companion with $missingUuid",
+                exception.message
+            )
+        }
+    }
+
+    @Test
+    fun checkExecuteAsyncIdbRequestWExceptionTest() {
+        runBlocking {
+            val idbRequest = PullRequest("")
+            val missingUuid = UUID.randomUUID().toString()
+            val exception = assertThrows<NoCompanionWithUdidException> {
+                idbClient.execute(idbRequest, missingUuid)
+            }
+            Assertions.assertEquals(
+                "There is no companion with $missingUuid",
+                exception.message
+            )
+        }
+    }
+
+    @Test
+    fun checkExecuteAsyncIdbRequestTest() {
+        runBlocking {
+            prepareCompanionForTest()
+            val idbRequest = PullRequest("")
+            val response = assertDoesNotThrow {
+                idbClient.execute(idbRequest, udid)
+            }
+            Assertions.assertEquals(
+                fileBytes.map { it.toUnsignedValue() },
+                response.first().map { it.toUnsignedValue() }
             )
         }
     }

@@ -54,3 +54,5 @@ internal fun defaultDescriptionAnswer(udid: String) =
         ).build()
 
 const val wSimulatorsProperty = "wSimulators"
+
+internal fun Byte.toUnsignedValue(): Int = this.toInt() and 0xFF
