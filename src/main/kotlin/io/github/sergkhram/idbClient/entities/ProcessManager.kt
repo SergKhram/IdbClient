@@ -2,7 +2,7 @@ package io.github.sergkhram.idbClient.entities
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.sergkhram.idbClient.Const.localTargetsListCmd
-import io.github.sergkhram.idbClient.Const.startLocalCompanionCmd
+import io.github.sergkhram.idbClient.Const.startCompanionCmd
 import io.github.sergkhram.idbClient.logs.KLogger
 import io.github.sergkhram.idbClient.util.beautifyJsonString
 import io.github.sergkhram.idbClient.util.cmdBuilder
@@ -17,7 +17,7 @@ internal object ProcessManager {
     internal fun startLocalCompanion(udid: String): Pair<Process, Int> {
         val port = getFreePort()
         val processBuilder = cmdBuilder(
-            startLocalCompanionCmd(
+            startCompanionCmd(
                 udid,
                 port
             )
