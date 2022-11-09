@@ -114,8 +114,3 @@ internal fun JsonNode.getUdids(): List<String> =
         .mapNotNull {
             it.get("udid")?.asText()
         }
-
-@RequiresOptIn(message = "This API is experimental. Don't use it without check the result", RequiresOptIn.Level.WARNING)
-@Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-annotation class IdbExperimental

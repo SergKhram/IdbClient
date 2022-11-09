@@ -4,7 +4,7 @@ import idb.CompanionInfo
 import idb.ScreenDimensions
 import idb.TargetDescription
 import idb.TargetDescriptionResponse
-import io.github.sergkhram.idbClient.entities.ProcessManager
+import io.github.sergkhram.idbClient.managers.ProcessManager
 import java.io.File
 import java.lang.reflect.Method
 

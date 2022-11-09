@@ -5,7 +5,7 @@ import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
 import io.github.sergkhram.idbClient.Const.localTargetsListCmd
 import io.github.sergkhram.idbClient.Const.startCompanionCmd
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
+import io.github.sergkhram.idbClient.managers.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.address.Address
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData

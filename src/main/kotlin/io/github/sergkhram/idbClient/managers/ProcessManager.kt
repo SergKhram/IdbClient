@@ -1,4 +1,4 @@
-package io.github.sergkhram.idbClient.entities
+package io.github.sergkhram.idbClient.managers
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.github.sergkhram.idbClient.Const.localTargetsListCmd

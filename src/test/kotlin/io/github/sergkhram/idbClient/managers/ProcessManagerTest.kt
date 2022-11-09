@@ -1,9 +1,9 @@
-package io.github.sergkhram.idbClient.entities
+package io.github.sergkhram.idbClient.managers
 
 import io.github.sergkhram.idbClient.BaseTest
-import io.github.sergkhram.idbClient.entities.ProcessManager.available
-import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
-import io.github.sergkhram.idbClient.entities.ProcessManager.startLocalCompanion
+import io.github.sergkhram.idbClient.managers.ProcessManager.available
+import io.github.sergkhram.idbClient.managers.ProcessManager.getLocalTargetsJson
+import io.github.sergkhram.idbClient.managers.ProcessManager.startLocalCompanion
 import io.github.sergkhram.idbClient.getFreePortMethod
 import io.github.sergkhram.idbClient.secondSimulatorUdid
 import io.github.sergkhram.idbClient.wSimulatorsProperty

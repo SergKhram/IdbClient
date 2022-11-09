@@ -5,6 +5,7 @@ import io.github.sergkhram.idbClient.Const.localGrpcStartTimeout
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
 import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
 import io.github.sergkhram.idbClient.getFreePortMethod
+import io.github.sergkhram.idbClient.managers.ProcessManager
 import io.github.sergkhram.idbClient.secondSimulatorUdid
 import io.github.sergkhram.idbClient.wSimulatorsProperty
 import io.grpc.ManagedChannel
