@@ -12,7 +12,6 @@ import io.github.sergkhram.idbClient.ssh.CmdResult
 import io.github.sergkhram.idbClient.ssh.SSHConfig
 import io.github.sergkhram.idbClient.ssh.SSHExecutor
 import io.github.sergkhram.idbClient.util.GetHostTargetsException
-import io.github.sergkhram.idbClient.util.IdbExperimental
 import io.github.sergkhram.idbClient.util.NoCompanionWithUdidException
 import io.github.sergkhram.idbClient.util.NoSimulatorsOnHostException
 import io.grpc.ManagedChannel

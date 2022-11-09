@@ -90,7 +90,7 @@ class GrpcClientTest: BaseTest() {
     }
 
     @Test
-    fun checkWaitUntilLocalCompanionStartedTest(softly: SoftAssertions) {
+    fun checkWaitUntilLocalCompanionStartedTest() {
         val port = getFreePortMethod().invoke(ProcessManager) as Int
         ss = ServerSocket(port)
         runBlocking {
@@ -125,7 +125,7 @@ class GrpcClientTest: BaseTest() {
     }
 
     @Test
-    fun checkWaitUntilLocalCompanionStartedWithDeferredStartTest(softly: SoftAssertions) {
+    fun checkWaitUntilLocalCompanionStartedWithDeferredStartTest() {
         val port = getFreePortMethod().invoke(ProcessManager) as Int
         runBlocking {
             val client = GrpcClient(LocalCompanionData("udid"))
