@@ -430,7 +430,7 @@ class IOSDebugBridgeClientTest : BaseTest() {
             )
         }
         assertThat(exception.message)
-            .isEqualTo("There is no simulators on this host: ${config.host}")
+            .isEqualTo("There are no simulators on this host: ${config.host}")
     }
 
     @Test
