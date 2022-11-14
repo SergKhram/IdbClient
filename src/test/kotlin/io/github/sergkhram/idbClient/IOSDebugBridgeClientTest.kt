@@ -58,7 +58,8 @@ class IOSDebugBridgeClientTest : BaseTest() {
         "Output 2",
         "Output 3"
     )
-    val fileBytes = getResourceFile(this::class.java, expectedFile).readBytes()
+    private val fileBytes = getResourceFile(this::class.java, expectedFile).readBytes()
+    private val config = SSHConfig("127.0.0.1", "", "")
 
     private val serviceImpl: CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase = mock(
         CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase::class.java,
@@ -364,7 +365,6 @@ class IOSDebugBridgeClientTest : BaseTest() {
 
     @Test
     fun checkGetHostTargetsTest() {
-        val config = SSHConfig("", "", "")
         mockkObject(SSHExecutor)
         every {
             SSHExecutor.execute(
@@ -391,7 +391,6 @@ class IOSDebugBridgeClientTest : BaseTest() {
 
     @Test
     fun checkGetHostTargetsCmdExceptionTest() {
-        val config = SSHConfig("127.0.0.1", "", "")
         mockkObject(SSHExecutor)
         every {
             SSHExecutor.execute(
@@ -414,7 +413,6 @@ class IOSDebugBridgeClientTest : BaseTest() {
 
     @Test
     fun checkGetHostTargetsEmptyListExceptionTest() {
-        val config = SSHConfig("127.0.0.1", "", "")
         mockkObject(SSHExecutor)
         every {
             SSHExecutor.execute(
@@ -435,7 +433,6 @@ class IOSDebugBridgeClientTest : BaseTest() {
 
     @Test
     fun checkStartRemoteTargetCompanionDefaultPortTest() {
-        val config = SSHConfig("127.0.0.1", "", "")
         val remoteCompanionCmd = Const.startCompanionCmd(
             udid,
             10882
@@ -461,7 +458,6 @@ class IOSDebugBridgeClientTest : BaseTest() {
 
     @Test
     fun checkStartRemoteTargetCompanionTest() {
-        val config = SSHConfig("127.0.0.1", "", "")
         val remoteCompanionCmd = Const.startCompanionCmd(
             udid,
             10883
@@ -488,7 +484,6 @@ class IOSDebugBridgeClientTest : BaseTest() {
 
     @Test
     fun checkStartRemoteTargetCompanionFailedStartExceptionTest() {
-        val config = SSHConfig("127.0.0.1", "", "")
         val remoteCompanionCmd = Const.startCompanionCmd(
             udid,
             10882
