@@ -209,7 +209,7 @@ class IOSDebugBridgeClient(
                 !cmdResult.error.isNullOrEmpty() ||
                 (cmdResult.exitCode!=null && cmdResult.exitCode!!>0)
             ) {
-                log.warn("Start remote target process for $udid failed: ${cmdResult.error}")
+                log.warn("Start remote target($host) process for $udid failed: ${cmdResult.error}")
                 false
             }
             else true
