@@ -55,6 +55,7 @@ internal object SSHExecutor {
 
     private fun SSHConfig.withSession(block: Session.() -> CmdResult): CmdResult {
         JSch().getSession(user, host, port).apply {
+            this.setConfig("StrictHostKeyChecking", "no")
             this.setPassword(password)
             log.debug("Connecting to SSH host $host:$port")
             connect(connectionTimeout)
