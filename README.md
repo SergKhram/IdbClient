@@ -15,7 +15,7 @@ We provide commands' wrappers to functionality of idb companion(you can check th
 <dependency>
   <groupId>io.github.sergkhram</groupId>
   <artifactId>idbclient</artifactId>
-  <version>0.0.4-RELEASE</version>
+  <version>0.0.5-RELEASE</version>
 </dependency>
 ```
 2. Create idbClient: 

@@ -3,7 +3,7 @@
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;dependency&gt;
   &lt;groupId&gt;io.github.sergkhram&lt;/groupId&gt;
   &lt;artifactId&gt;idbclient&lt;/artifactId&gt;
-  &lt;version&gt;0.0.4-RELEASE&lt;/version&gt;
+  &lt;version&gt;0.0.5-RELEASE&lt;/version&gt;
 &lt;/dependency&gt;
 </code></pre></div></div>
 <h3 style="color:#444;">Create idbClient</h3>
