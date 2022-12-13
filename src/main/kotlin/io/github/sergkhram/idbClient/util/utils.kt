@@ -1,5 +1,7 @@
 package io.github.sergkhram.idbClient.util
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
 import io.github.sergkhram.idbClient.entities.address.Address
 import io.github.sergkhram.idbClient.entities.address.DomainSocketAddress
 import io.github.sergkhram.idbClient.entities.address.TcpAddress
@@ -106,3 +108,9 @@ internal fun String.beautifyJsonString() = JsonUtil.convertStringToJsonNode(
         )
     }]"
 )
+
+internal fun JsonNode.getUdids(): List<String> =
+    (this as ArrayNode)
+        .mapNotNull {
+            it.get("udid")?.asText()
+        }

@@ -1,10 +1,11 @@
 package io.github.sergkhram.idbClient
 
-import com.fasterxml.jackson.databind.node.ArrayNode
 import idb.ConnectRequest
 import io.github.sergkhram.idbClient.Const.localIdbCompanionPath
+import io.github.sergkhram.idbClient.Const.localTargetsListCmd
+import io.github.sergkhram.idbClient.Const.startCompanionCmd
 import io.github.sergkhram.idbClient.entities.GrpcClient
-import io.github.sergkhram.idbClient.entities.ProcessManager.getLocalTargetsJson
+import io.github.sergkhram.idbClient.managers.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.entities.address.Address
 import io.github.sergkhram.idbClient.entities.companion.CompanionData
 import io.github.sergkhram.idbClient.entities.companion.LocalCompanionData
@@ -16,7 +17,11 @@ import io.github.sergkhram.idbClient.requests.AsyncIdbRequest
 import io.github.sergkhram.idbClient.requests.IdbRequest
 import io.github.sergkhram.idbClient.requests.PredicateIdbRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
-import io.github.sergkhram.idbClient.util.NoCompanionWithUdidException
+import io.github.sergkhram.idbClient.ssh.SSHConfig
+import io.github.sergkhram.idbClient.ssh.SSHExecutor
+import io.github.sergkhram.idbClient.util.*
+import io.github.sergkhram.idbClient.util.beautifyJsonString
+import io.github.sergkhram.idbClient.util.getUdids
 import io.github.sergkhram.idbClient.util.isStartedOnMac
 import io.grpc.StatusException
 import kotlinx.coroutines.*
@@ -59,11 +64,8 @@ class IOSDebugBridgeClient(
             && File(localIdbCompanionPath).exists()
         ) {
             val localTargetsJson = getLocalTargetsJson()
-            localTargetsJson?.let { json ->
-                (json as ArrayNode)
-                    .mapNotNull {
-                        it.get("udid")?.asText()
-                    }.forEach {
+            localTargetsJson?.let {json ->
+                json.getUdids().forEach {
                         clients[it] = LocalCompanionData(it)
                     }
             }
@@ -178,6 +180,39 @@ class IOSDebugBridgeClient(
             (entry.value as RemoteCompanionData).shutdownChannel()
             clients.remove(entry.key)
             log.debug("Disconnecting $address companion finished")
+        }
+    }
+
+    @IdbExperimental
+    fun getHostTargets(sshConfig: SSHConfig): List<String> {
+        with(sshConfig) {
+            val cmdResult = SSHExecutor.execute(this, localTargetsListCmd.joinToString(" "))
+            if(!cmdResult.error.isNullOrEmpty())
+                throw GetHostTargetsException(host, port, cmdResult.error!!)
+            else {
+                return cmdResult.output
+                    ?.beautifyJsonString()
+                    ?.getUdids() ?: throw NoSimulatorsOnHostException(host)
+            }
+        }
+    }
+
+    @IdbExperimental
+    fun startRemoteTargetCompanion(sshConfig: SSHConfig, udid: String, companionPort: Int = 10882): Boolean {
+        with(sshConfig) {
+            val startRemoteCompanionCmd = startCompanionCmd(
+                udid,
+                companionPort
+            ).plus(">/dev/null 2>&1 &")
+            val cmdResult = SSHExecutor.execute(this, startRemoteCompanionCmd.joinToString(" "))
+            return if(
+                !cmdResult.error.isNullOrEmpty() ||
+                (cmdResult.exitCode!=null && cmdResult.exitCode!!>0)
+            ) {
+                log.warn("Start remote target($host) process for $udid failed: ${cmdResult.error}")
+                false
+            }
+            else true
         }
     }
 

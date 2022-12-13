@@ -8,18 +8,28 @@ import io.github.sergkhram.idbClient.entities.requestsBody.management.LogSource
 import io.github.sergkhram.idbClient.requests.files.PullRequest
 import io.github.sergkhram.idbClient.requests.management.DescribeRequest
 import io.github.sergkhram.idbClient.requests.management.LogRequest
+import io.github.sergkhram.idbClient.ssh.CmdResult
+import io.github.sergkhram.idbClient.ssh.SSHConfig
+import io.github.sergkhram.idbClient.ssh.SSHExecutor
+import io.github.sergkhram.idbClient.util.GetHostTargetsException
 import io.github.sergkhram.idbClient.util.NoCompanionWithUdidException
+import io.github.sergkhram.idbClient.util.NoSimulatorsOnHostException
 import io.grpc.ManagedChannel
 import io.grpc.inprocess.InProcessChannelBuilder
 import io.grpc.inprocess.InProcessServerBuilder
 import io.grpc.testing.GrpcCleanupRule
+import io.mockk.every
+import io.mockk.mockkObject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.mockito.AdditionalAnswers.delegatesTo
 import org.mockito.Mockito.mock
 import java.lang.reflect.Field
@@ -35,7 +45,7 @@ import kotlin.reflect.jvm.isAccessible
 import idb.LogRequest as IdbLogRequest
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class IOSDebugBridgeClientTest: BaseTest() {
+class IOSDebugBridgeClientTest : BaseTest() {
 
     private val grpcCleanup = GrpcCleanupRule()
     private val idbClient = IOSDebugBridgeClient()
@@ -48,10 +58,12 @@ class IOSDebugBridgeClientTest: BaseTest() {
         "Output 2",
         "Output 3"
     )
-    val fileBytes = getResourceFile(this::class.java, expectedFile).readBytes()
+    private val fileBytes = getResourceFile(this::class.java, expectedFile).readBytes()
+    private val config = SSHConfig("127.0.0.1", "", "")
 
     private val serviceImpl: CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase = mock(
-        CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase::class.java, delegatesTo<CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase>(
+        CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase::class.java,
+        delegatesTo<CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase>(
             object : CompanionServiceGrpcKt.CompanionServiceCoroutineImplBase() {
                 override suspend fun describe(request: TargetDescriptionRequest): TargetDescriptionResponse {
                     return defaultDescription
@@ -66,14 +78,14 @@ class IOSDebugBridgeClientTest: BaseTest() {
                 override fun log(request: IdbLogRequest): Flow<LogResponse> {
                     return flow {
                         listOfLogs.forEach {
-                            if(it.contains("3")) {
+                            if (it.contains("3")) {
                                 delay(3000)
                             }
                             emit(
                                 LogResponse.newBuilder()
                                     .setOutput(
                                         ByteString.copyFromUtf8(
-                                            if(request.source.number == LogSource.TARGET.value)
+                                            if (request.source.number == LogSource.TARGET.value)
                                                 it
                                             else
                                                 "$it companion"
@@ -177,11 +189,12 @@ class IOSDebugBridgeClientTest: BaseTest() {
             )
             val pMapFunc = getPMapFunc()
             suspend fun suspendFun(data: Map.Entry<String, String>) {
-                if(data.key == firstUuid) {
+                if (data.key == firstUuid) {
                     delay(delayValue)
                 }
                 listOfValues.add(data.value)
             }
+
             val job = launch {
                 pMapFunc.callSuspend(
                     idbClient,
@@ -189,7 +202,7 @@ class IOSDebugBridgeClientTest: BaseTest() {
                     ::suspendFun
                 )
             }
-            delay(delayValue/2)
+            delay(delayValue / 2)
             softly.assertThat(listOfValues.size).isEqualTo(1)
             softly.assertThat(listOfValues).containsExactly(secondUuid)
             job.join()
@@ -233,7 +246,7 @@ class IOSDebugBridgeClientTest: BaseTest() {
         runBlocking {
             prepareCompanionForTest()
             val idbRequest = LogRequest(
-                {false}
+                { false }
             )
             val response = assertDoesNotThrow {
                 idbClient.execute(idbRequest, udid)
@@ -350,10 +363,156 @@ class IOSDebugBridgeClientTest: BaseTest() {
         }
     }
 
+    @Test
+    fun checkGetHostTargetsTest() {
+        mockkObject(SSHExecutor)
+        every {
+            SSHExecutor.execute(
+                config,
+                Const.localTargetsListCmd.joinToString(" ")
+            )
+        } returns CmdResult(
+            0,
+            dirtyJson
+        )
+        val result = assertDoesNotThrow {
+            idbClient.getHostTargets(
+                config
+            )
+        }
+        assertThat(result)
+            .containsExactlyInAnyOrderElementsOf(
+                listOf(
+                    "57F21C95-A14C-4599-927A-2304C81645E5",
+                    "F6898331-B68E-41F2-98EA-FD436F420C4A"
+                )
+            )
+    }
+
+    @Test
+    fun checkGetHostTargetsCmdExceptionTest() {
+        mockkObject(SSHExecutor)
+        every {
+            SSHExecutor.execute(
+                config,
+                Const.localTargetsListCmd.joinToString(" ")
+            )
+        } returns CmdResult(
+            1,
+            "",
+            "error"
+        )
+        val exception = assertThrows<GetHostTargetsException> {
+            idbClient.getHostTargets(
+                config
+            )
+        }
+        assertThat(exception.message)
+            .isEqualTo("Get host' targets process failed for ${config.host}:${config.port} with reason: error")
+    }
+
+    @Test
+    fun checkGetHostTargetsEmptyListExceptionTest() {
+        mockkObject(SSHExecutor)
+        every {
+            SSHExecutor.execute(
+                config,
+                Const.localTargetsListCmd.joinToString(" ")
+            )
+        } returns CmdResult(
+            0
+        )
+        val exception = assertThrows<NoSimulatorsOnHostException> {
+            idbClient.getHostTargets(
+                config
+            )
+        }
+        assertThat(exception.message)
+            .isEqualTo("There are no simulators on this host: ${config.host}")
+    }
+
+    @Test
+    fun checkStartRemoteTargetCompanionDefaultPortTest() {
+        val remoteCompanionCmd = Const.startCompanionCmd(
+            udid,
+            10882
+        ).plus(">/dev/null 2>&1 &")
+        mockkObject(SSHExecutor)
+        every {
+            SSHExecutor.execute(
+                config,
+                remoteCompanionCmd.joinToString(" ")
+            )
+        } returns CmdResult(
+            0,
+            ""
+        )
+        val result = assertDoesNotThrow {
+            idbClient.startRemoteTargetCompanion(
+                config,
+                udid
+            )
+        }
+        assertTrue(result)
+    }
+
+    @Test
+    fun checkStartRemoteTargetCompanionTest() {
+        val remoteCompanionCmd = Const.startCompanionCmd(
+            udid,
+            10883
+        ).plus(">/dev/null 2>&1 &")
+        mockkObject(SSHExecutor)
+        every {
+            SSHExecutor.execute(
+                config,
+                remoteCompanionCmd.joinToString(" ")
+            )
+        } returns CmdResult(
+            0,
+            ""
+        )
+        val result = assertDoesNotThrow {
+            idbClient.startRemoteTargetCompanion(
+                config,
+                udid,
+                10883
+            )
+        }
+        assertTrue(result)
+    }
+
+    @Test
+    fun checkStartRemoteTargetCompanionFailedStartExceptionTest() {
+        val remoteCompanionCmd = Const.startCompanionCmd(
+            udid,
+            10882
+        ).plus(">/dev/null 2>&1 &")
+        val error = "some error"
+        mockkObject(SSHExecutor)
+        every {
+            SSHExecutor.execute(
+                config,
+                remoteCompanionCmd.joinToString(" ")
+            )
+        } returns CmdResult(
+            1,
+            "",
+            error
+        )
+        val result = assertDoesNotThrow {
+            idbClient.startRemoteTargetCompanion(
+                config,
+                udid
+            )
+        }
+        assertFalse(result)
+    }
+
     @AfterEach
     fun afterEach() {
         getClientsList().clear()
-        if(this::channel.isInitialized) channel.shutdownNow()
+        if (this::channel.isInitialized) channel.shutdownNow()
     }
 
     @AfterAll
@@ -393,4 +552,10 @@ class IOSDebugBridgeClientTest: BaseTest() {
         func.isAccessible = true
         return func
     }
+
+    private val dirtyJson = "{\"model\":\"iPad Pro (9.7-inch)\",\"os_version\":\"iOS 15.5\",\"udid\":\"57F21C95-A" +
+            "14C-4599-927A-2304C81645E5\",\"architecture\":\"x86_64\",\"type\":\"Simulator\",\"name\":\"iPad Pro " +
+            "(9.7-inch)\",\"state\":\"Shutdown\"}\n{\"model\":\"iPad Pro (9.7-inch)\",\"os_version\":\"iOS 15.5\",\"ud" +
+            "id\":\"F6898331-B68E-41F2-98EA-FD436F420C4A\",\"architecture\":\"x86_64\",\"type\":\"Simulator\",\"na" +
+            "me\":\"iPad Pro (9.7-inch)\",\"state\":\"Shutdown\"}"
 }
