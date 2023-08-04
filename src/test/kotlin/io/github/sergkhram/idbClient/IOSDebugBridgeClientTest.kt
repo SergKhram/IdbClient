@@ -517,9 +517,9 @@ class IOSDebugBridgeClientTest : BaseTest() {
 
     @AfterAll
     fun teardown() {
-        val teardownMethod = GrpcCleanupRule::class.java.getDeclaredMethod("teardown")
-        teardownMethod.isAccessible = true
-        teardownMethod.invoke(grpcCleanup)
+//        val teardownMethod = GrpcCleanupRule::class.java.getDeclaredMethod("teardown")
+//        teardownMethod.isAccessible = true
+//        teardownMethod.invoke(grpcCleanup)
     }
 
     private fun getChannel(): Field {
