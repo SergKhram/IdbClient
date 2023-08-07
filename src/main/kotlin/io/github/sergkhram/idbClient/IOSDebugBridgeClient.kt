@@ -197,8 +197,15 @@ class IOSDebugBridgeClient(
         }
     }
 
+    /**
+     * Start remote companion
+     * @param sshConfig - config to the host for starting companion
+     * @param udid - udid for companion
+     * @param companionPort - port for companion. Default is 10882
+     * @return pair of Boolean result(success or not) and String output if exists(contains processId)
+     */
     @IdbExperimental
-    fun startRemoteTargetCompanion(sshConfig: SSHConfig, udid: String, companionPort: Int = 10882): Boolean {
+    fun startRemoteTargetCompanion(sshConfig: SSHConfig, udid: String, companionPort: Int = 10882): Pair<Boolean, String?> {
         with(sshConfig) {
             val startRemoteCompanionCmd = startCompanionCmd(
                 udid,
@@ -210,6 +217,27 @@ class IOSDebugBridgeClient(
                 (cmdResult.exitCode!=null && cmdResult.exitCode!!>0)
             ) {
                 log.warn("Start remote target($host) process for $udid failed: ${cmdResult.error}")
+                Pair(false, null)
+            }
+            else Pair(true, cmdResult.output)
+        }
+    }
+
+    /**
+     * Kill remote companion process
+     * @param sshConfig - config to the host for starting companion
+     * @param processId - id of the companion process
+     * @return Boolean result(success or not)
+     */
+    @IdbExperimental
+    fun killRemoteTargetCompanion(sshConfig: SSHConfig, processId: String): Boolean {
+        with(sshConfig) {
+            val cmdResult = SSHExecutor.execute(this, "kill $processId")
+            return if(
+                !cmdResult.error.isNullOrEmpty() ||
+                (cmdResult.exitCode!=null && cmdResult.exitCode!!>0)
+            ) {
+                log.warn("Kill remote target($host) process for $processId failed: ${cmdResult.error}")
                 false
             }
             else true

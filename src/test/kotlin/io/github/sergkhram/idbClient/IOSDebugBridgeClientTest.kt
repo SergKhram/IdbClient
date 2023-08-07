@@ -453,7 +453,8 @@ class IOSDebugBridgeClientTest : BaseTest() {
                 udid
             )
         }
-        assertTrue(result)
+        assertTrue(result.first)
+        Assertions.assertNotNull(result.second)
     }
 
     @Test
@@ -479,7 +480,8 @@ class IOSDebugBridgeClientTest : BaseTest() {
                 10883
             )
         }
-        assertTrue(result)
+        assertTrue(result.first)
+        Assertions.assertNotNull(result.second)
     }
 
     @Test
@@ -506,7 +508,8 @@ class IOSDebugBridgeClientTest : BaseTest() {
                 udid
             )
         }
-        assertFalse(result)
+        assertFalse(result.first)
+        Assertions.assertNull(result.second)
     }
 
     @AfterEach
