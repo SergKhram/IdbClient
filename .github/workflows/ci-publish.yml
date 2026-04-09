@@ -8,6 +8,10 @@ on:
 jobs:
   release:
     runs-on: ubuntu-24.04
+    env:
+      CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+      CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
+
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -18,6 +22,9 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
+          server-id: central
+          server-username: CENTRAL_USERNAME
+          server-password: CENTRAL_TOKEN
 
       - name: Import GPG key
         run: |
@@ -25,6 +32,3 @@ jobs:
 
       - name: Release Maven package
         run: mvn -B deploy -Pdeploy -Dgpg.passphrase=${{ secrets.SECRET_PASSPHRASE }}
-        env:
-          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
-          CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
