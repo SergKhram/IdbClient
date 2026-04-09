@@ -17,15 +17,15 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: maven
 
       - name: Import GPG key
-        if: ${{ secrets.GPG_KEY }} != ''
         run: |
           echo "${{ secrets.GPG_KEY }}" | gpg --batch --import
 
       - name: Release Maven package
-        run: mvn -B deploy
+        run: mvn -B deploy -Pdeploy
         env:
+          GPG_PASSPHRASE: ${{ secrets.SECRET_PASSPHRASE }}
           CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
           CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
-          GPG_PASSPHRASE: ${{ secrets.SECRET_PASSPHRASE }}
