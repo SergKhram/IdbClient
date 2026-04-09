@@ -8,28 +8,28 @@ on:
 
 jobs:
   build:
-    runs-on: macos-12
+    runs-on: macos-14
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 11
-      uses: actions/setup-java@v3
+    - uses: actions/checkout@v4
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
       with:
-        java-version: '11'
+        java-version: '17'
         distribution: 'temurin'
         cache: maven
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1
       with:
-        xcode-version: '13.4.1'
+        xcode-version: '15.4'
     - name: Setup simulator
-      uses: futureware-tech/simulator-action@v2
+      uses: futureware-tech/simulator-action@v4
       with:
-        model: 'iPhone 13'
+        model: 'iPhone 15'
       id: simulator
     - name: Setup second simulator
-      uses: futureware-tech/simulator-action@v2
+      uses: futureware-tech/simulator-action@v4
       with:
-        model: 'iPhone 13 mini'
+        model: 'iPhone 15 Pro'
       id: second-simulator
     - name: Install idb
       run: |

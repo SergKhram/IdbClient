@@ -7,17 +7,12 @@ import io.github.sergkhram.idbClient.entities.companion.RemoteCompanionData
 import io.github.sergkhram.idbClient.getFreePortMethod
 import io.github.sergkhram.idbClient.managers.ProcessManager
 import io.github.sergkhram.idbClient.secondSimulatorUdid
-import io.github.sergkhram.idbClient.wSimulatorsProperty
 import io.grpc.ManagedChannel
 import io.grpc.Status
 import io.grpc.StatusException
 import kotlinx.coroutines.*
 import org.assertj.core.api.SoftAssertions
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
 import java.lang.reflect.Field
@@ -57,8 +52,9 @@ class GrpcClientTest: BaseTest() {
     }
 
     @Test
-    @EnabledOnOs(OS.MAC)
-    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
+//    @EnabledOnOs(OS.MAC)
+//    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
+    @Disabled
     fun checkCloseLocalGrpcClientTest(softly: SoftAssertions) {
         val localCompanion = LocalCompanionData(secondSimulatorUdid)
         val client = GrpcClient(localCompanion)

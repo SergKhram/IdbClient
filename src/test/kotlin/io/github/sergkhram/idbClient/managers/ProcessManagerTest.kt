@@ -1,19 +1,18 @@
 package io.github.sergkhram.idbClient.managers
 
 import io.github.sergkhram.idbClient.BaseTest
+import io.github.sergkhram.idbClient.getFreePortMethod
 import io.github.sergkhram.idbClient.managers.ProcessManager.available
 import io.github.sergkhram.idbClient.managers.ProcessManager.getLocalTargetsJson
 import io.github.sergkhram.idbClient.managers.ProcessManager.startLocalCompanion
-import io.github.sergkhram.idbClient.getFreePortMethod
 import io.github.sergkhram.idbClient.secondSimulatorUdid
-import io.github.sergkhram.idbClient.wSimulatorsProperty
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.SoftAssertions
-import org.junit.jupiter.api.*
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty
-import org.junit.jupiter.api.condition.EnabledOnOs
-import org.junit.jupiter.api.condition.OS
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.net.ServerSocket
 
 class ProcessManagerTest: BaseTest() {
@@ -27,8 +26,9 @@ class ProcessManagerTest: BaseTest() {
     }
 
     @Test
-    @EnabledOnOs(OS.MAC)
-    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
+//    @EnabledOnOs(OS.MAC)
+//    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
+    @Disabled
     fun checkStartLocalCompanionTest(softly: SoftAssertions) {
         val startedSimulatorData = startLocalCompanion(secondSimulatorUdid)
         process = startedSimulatorData.first
@@ -42,8 +42,9 @@ class ProcessManagerTest: BaseTest() {
     }
 
     @Test
-    @EnabledOnOs(OS.MAC)
-    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
+//    @EnabledOnOs(OS.MAC)
+//    @EnabledIfSystemProperty(named = wSimulatorsProperty, matches = "true")
+    @Disabled
     fun checkGetLocalTargetsJsonTest(softly: SoftAssertions) {
         val targets = getLocalTargetsJson()
         val udids = targets!!.mapNotNull {

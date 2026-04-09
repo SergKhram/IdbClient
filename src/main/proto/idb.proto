@@ -41,6 +41,8 @@ service CompanionService {
   rpc revoke(RevokeRequest) returns (RevokeResponse) {}
   rpc clear_keychain(ClearKeychainRequest) returns (ClearKeychainResponse) {}
   rpc contacts_update(ContactsUpdateRequest) returns (ContactsUpdateResponse) {}
+  rpc contacts_clear(ContactsClearRequest) returns (ContactsClearResponse) {}
+  rpc photos_clear(PhotosClearRequest) returns (PhotosClearResponse) {}
   rpc setting(SettingRequest) returns (SettingResponse) {} // Sets settings
   rpc get_setting(GetSettingRequest) returns (GetSettingResponse) {
   } // Gets current setting
@@ -322,6 +324,14 @@ message ContactsUpdateRequest {
 
 message ContactsUpdateResponse {}
 
+message ContactsClearRequest {}
+
+message ContactsClearResponse {}
+
+message PhotosClearRequest {}
+
+message PhotosClearResponse {}
+
 message TargetDescriptionRequest {
   bool fetch_diagnostics = 1;
 }
@@ -465,6 +475,7 @@ message VideoStreamRequest {
     double compression_quality = 4;
     double scale_factor = 5;
     double avg_bitrate = 6;
+    double key_frame_rate = 7;
   }
   message Stop {}
   oneof control {
@@ -695,6 +706,7 @@ message XctestRunRequest {
     }
     bool collect = 1;
     Format format = 2;
+    bool enable_continuous_coverage_collection = 3;
   }
   Mode mode = 1;
   string test_bundle_id = 2;
