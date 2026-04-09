@@ -24,8 +24,7 @@ jobs:
           echo "${{ secrets.GPG_KEY }}" | gpg --batch --import
 
       - name: Release Maven package
-        run: mvn -B deploy -Pdeploy
+        run: mvn -B deploy -Pdeploy -Dgpg.passphrase=${{ secrets.SECRET_PASSPHRASE }}
         env:
-          GPG_PASSPHRASE: ${{ secrets.SECRET_PASSPHRASE }}
           CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
           CENTRAL_TOKEN: ${{ secrets.CENTRAL_TOKEN }}
